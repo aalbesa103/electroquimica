@@ -1,1 +1,1619 @@
-.
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electrólisis: Forzando Reacciones Químicas No Espontáneas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- KaTeX para Fórmulas Matemáticas (Opcional pero recomendado) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmMA++PNWDLMy-3hDhNudNVfq7YPCIpEXBbzF" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js" integrity="sha384-X/XCfMm41VSsqRNQgDerQczD69XqmjOOOwYQvr/GMksACknN+fg9tyEqXCpmwender" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <style>
+    html {
+      scroll-behavior: smooth; /* Habilita el scroll suave */
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1a3a8f 0%, #092056 100%);
+      color: white;
+      line-height: 1.6;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Montserrat', sans-serif;
+      color: #e0f2f7; /* Light blue-gray for headings */
+    }
+    .section {
+      min-height: 100vh; /* Each section attempts to fill the viewport height */
+      padding: 4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+    }
+    .section-content {
+      max-width: 1200px;
+      width: 100%;
+      text-align: left;
+    }
+    .bg-gradient-blue {
+      background: linear-gradient(135deg, #1a3a8f 0%, #092056 100%);
+    }
+    .text-gradient-blue {
+      background: linear-gradient(45deg, #63b3ed, #38a169);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cell-diagram-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px; /* Max width for diagram */
+        height: 250px; /* Fixed height for diagram */
+        margin: 20px auto;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        background: rgba(0, 20, 60, 0.4);
+        overflow: hidden;
+    }
+     /* Specific styles for Faraday diagrams */
+    .faraday-diagram {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 300px;
+        margin: 20px auto;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        background: rgba(0, 20, 60, 0.4);
+        overflow: hidden;
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        padding-bottom: 10px;
+    }
+    .faraday-electrode {
+        width: 20px; /* Thinner electrode */
+        height: 200px; /* Electrode height */
+        background-color: #d1d5db;
+        position: relative;
+        border-radius: 3px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end; /* Content at bottom */
+        align-items: center;
+        font-size: 0.8rem;
+        color: #333;
+        font-weight: bold;
+        padding-bottom: 5px;
+         box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+    }
+    .faraday-solution {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 220px; /* Solution level */
+        background: rgba(59, 130, 246, 0.15);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+     .deposited-mass {
+        position: absolute;
+        bottom: 0; /* Starts at the bottom */
+        left: 0; /* Position relative to electrode */
+        width: 100%; /* Same width as electrode */
+        background-color: #facc15; /* Yellow for deposited solid */
+        height: 0; /* Base height, will be set by JS */
+        transform-origin: bottom center;
+        transition: height 0.3s ease-out; /* Smooth transition */
+         border-radius: 3px 3px 0 0; /* Rounded top */
+         z-index: 10; /* Above electrode base color */
+    }
+     .gas-produced {
+        position: absolute;
+        top: 0; /* Starts at the top surface */
+        left: 0; /* Position relative to electrode */
+        width: 100%; /* Same width as electrode */
+        background-color: rgba(16, 185, 129, 0.6); /* Green with opacity for gas */
+        height: 0; /* Base height, will be set by JS */
+        transform-origin: top center; /* Animation originates from the top */
+        transition: height 0.3s ease-out; /* Smooth transition */
+        border-radius: 0 0 3px 3px; /* Rounded bottom */
+         z-index: 10;
+         /* Position calculation will be handled by JS if needed to simulate rising from solution */
+     }
+     .faraday-electrode span { /* Label below electrode */
+         position: absolute;
+         bottom: -25px;
+         width: 100px;
+         text-align: center;
+         font-size: 0.9rem;
+         color: #e0f2f7;
+     }
+
+    .electrode {
+        position: absolute;
+        width: 15px;
+        height: 150px;
+        bottom: 0;
+        background: #d1d5db; /* Gray */
+        border-radius: 3px;
+    }
+    .anode { left: 80px; }
+    .cathode { right: 80px; }
+
+    .solution {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 180px;
+        background: rgba(59, 130, 246, 0.15); /* Light blue with opacity */
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .ion {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        opacity: 0.8;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+    .cation { /* Positive ion */
+        background: #3b82f6; /* Blue */
+        /* Animation will be set dynamically if needed */
+    }
+    .anion { /* Negative ion */
+        background: #ef4444; /* Red */
+        /* Animation will be set dynamically if needed */
+    }
+
+    /* Animation keyframes for intro diagram */
+    @keyframes moveCationToCathode { /* Towards right for Galvanic, Towards left for Electrolytic(-) */
+        0% { transform: translateX(0); }
+        100% { transform: translateX(100px); }
+    }
+     @keyframes moveAnionToAnode { /* Towards left for Galvanic, Towards right for Electrolytic(+) */
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100px); }
+    }
+     @keyframes moveCationToCathodeElectro { /* Towards left cathode (-) */
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100px); }
+    }
+     @keyframes moveAnionToAnodeElectro { /* Towards right anode (+) */
+        0% { transform: translateX(0); }
+        100% { transform: translateX(100px); }
+    }
+
+
+    .electron-flow {
+        position: absolute;
+        top: 30px; /* Above the cell */
+        left: 80px; /* Start from anode */
+        width: calc(100% - 160px); /* Span between electrodes */
+        height: 2px;
+        /* Background handled by electron divs */
+    }
+
+    .electron {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #facc15; /* Yellow */
+        border-radius: 50%;
+        box-shadow: 0 0 5px #facc15;
+        top: -2px; /* Center on the flow line */
+        animation: electronTravel 2s infinite linear;
+    }
+     .electron.reverse {
+        animation: electronTravelReverse 2s infinite linear;
+     }
+
+    /* Electron flow animation */
+    @keyframes electronTravel { /* Anode to Cathode (Left to Right in Galvanic) */
+        0% { left: 0%; opacity: 0;}
+        10% { left: 10%; opacity: 1;}
+        90% { left: 90%; opacity: 1;}
+        100% { left: 100%; opacity: 0;}
+    }
+    @keyframes electronTravelReverse { /* Cathode to Anode (Right to Left in Electrolytic) */
+        0% { left: 100%; opacity: 0;}
+        10% { left: 90%; opacity: 1;}
+        90% { left: 10%; opacity: 1;}
+        100% { left: 0%; opacity: 0;}
+    }
+
+    .connection-wire {
+        position: absolute;
+        height: 2px;
+        background: #a0aec0; /* Gray wire */
+        top: 45px; /* Connect to power source level */
+    }
+    .wire-left { left: 80px; /* From anode */ }
+    .wire-right { right: 80px; /* From cathode */ }
+
+    .power-source {
+        position: absolute;
+        top: 15px; /* Top center */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 30px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        font-weight: bold;
+        color: white;
+        font-size: 14px;
+        border: 1px solid white;
+    }
+     .power-source .label {
+        font-size: 10px;
+        font-weight: normal;
+     }
+
+     .voltmeter { background: #10b981; } /* Green Voltmeter for Galvanic */
+     .battery { background: #f59e0b; } /* Orange Battery for Electrolytic */
+
+     .diagram-label {
+        position: absolute;
+        bottom: 10px; /* Inside the container */
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 5px;
+        color: white;
+     }
+     .label-galvanic { background: #10b981; } /* Green */
+     .label-electrolytic { background: #f59e0b; } /* Orange */
+
+     .key-point {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+     }
+     .key-point .icon {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        background: rgba(56, 182, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: #38bdf8;
+     }
+     .key-point p {
+        flex-grow: 1;
+         color: #e0f2f7; /* Lighter text for key points */
+     }
+     .highlight {
+        color: #60a5fa; /* Light Blue highlight */
+        font-weight: 600;
+     }
+     .highlight-orange {
+         color: #fbbf24; /* Amber/Orange */
+         font-weight: 600;
+     }
+      .highlight-green {
+         color: #34d399; /* Emerald/Green */
+         font-weight: 600;
+     }
+
+     .calculation-steps {
+         margin-top: 1rem;
+         padding: 1.5rem;
+         background: rgba(0, 0, 0, 0.3);
+         border-radius: 8px;
+         text-align: left;
+         font-size: 0.9rem;
+         color: #e0f2f7;
+         display: none; /* Hidden by default */
+         border: 1px solid rgba(255, 255, 255, 0.2);
+     }
+     .calculation-steps pre {
+         white-space: pre-wrap; /* Wrap long lines */
+         word-wrap: break-word;
+         font-family: 'Courier New', Courier, monospace;
+         background-color: rgba(0, 0, 0, 0.2);
+         padding: 1rem;
+         border-radius: 5px;
+     }
+      .calculation-steps h4 {
+         margin-bottom: 1rem;
+         color: #93c5fd; /* Lighter blue for subheadings */
+      }
+
+     .interactive-controls {
+         margin-top: 20px;
+         background: rgba(0, 0, 0, 0.2);
+         padding: 20px;
+         border-radius: 8px;
+         display: flex;
+         flex-direction: column; /* Stack controls vertically */
+         gap: 15px;
+         border: 1px solid rgba(255, 255, 255, 0.2);
+     }
+      .control-group {
+          display: flex;
+          flex-direction: column; /* Label above slider/select */
+          width: 100%;
+      }
+     .interactive-controls label {
+         margin-bottom: 5px; /* Space between label and control */
+         color: #e0f2f7;
+         font-size: 0.9rem;
+     }
+     .interactive-controls input[type="number"],
+     .interactive-controls select {
+         padding: 8px;
+         border-radius: 4px;
+         border: 1px solid #3b82f6;
+         background-color: #071a40;
+         color: white;
+         width: 100%; /* Full width */
+     }
+     .interactive-controls button {
+        padding: 10px 20px;
+        background-color: #3b82f6;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        align-self: center; /* Center button if needed */
+     }
+     .interactive-controls button:hover {
+         background-color: #2563eb;
+     }
+      .output-display {
+         margin-top: 15px;
+         padding: 10px;
+         background: rgba(0, 0, 0, 0.3);
+         border-radius: 5px;
+         text-align: center;
+      }
+       .output-display p {
+           margin-bottom: 5px;
+           color: #e0f2f7;
+           font-size: 1rem;
+       }
+        .output-display span {
+            font-weight: bold;
+            color: #facc15; /* Yellow for result values */
+        }
+
+     /* Styles for sliders */
+     .interactive-controls input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 8px;
+        background: #374151; /* Darker track */
+        outline: none;
+        opacity: 0.9;
+        transition: opacity 0.2s;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%; /* Full width */
+         border: 1px solid #4b5563;
+     }
+
+     .interactive-controls input[type="range"]:hover {
+        opacity: 1;
+     }
+
+     .interactive-controls input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #3b82f6; /* Blue thumb */
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid #1d4ed8; /* Darker blue border */
+         box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+     }
+
+      .interactive-controls input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #3b82f6;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid #1d4ed8;
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+     }
+      /* Display slider value next to label */
+     .interactive-controls label span {
+         font-weight: bold;
+         color: #facc15; /* Yellow for value */
+         margin-left: 5px;
+     }
+
+
+      /* Industrial Diagram Styles */
+      .industrial-diagram-container {
+          position: relative;
+          width: 100%;
+          max-width: 700px; /* Adjusted size */
+          height: 450px; /* Adjusted height */
+          margin: 20px auto;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 10px;
+          background: rgba(0, 20, 60, 0.5); /* Slightly darker background */
+          overflow: hidden;
+          display: flex; /* Using flex for alignment if needed */
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .diagram-element {
+          position: absolute;
+          background-color: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.4); /* Brighter border */
+          border-radius: 5px;
+          color: white;
+          font-size: 0.8rem; /* Slightly smaller text */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 5px 8px; /* Adjusted padding */
+          box-sizing: border-box;
+           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+           z-index: 5; /* Ensure elements are above streams */
+      }
+
+      .process-stream {
+          position: absolute;
+          background-color: rgba(192, 192, 192, 0.6); /* Light gray stream */
+          height: 3px;
+          z-index: 1; /* Behind elements */
+      }
+       .process-stream.vertical {
+           width: 3px;
+           height: auto; /* Height set by top/bottom */
+       }
+
+      .stream-arrow {
+          position: absolute;
+          width: 0;
+          height: 0;
+          border: 5px solid transparent; /* Base size */
+      }
+      /* Arrows colored same as stream */
+      .arrow-right { border-left: 8px solid rgba(192, 192, 192, 0.8); right: -7px; top: 50%; transform: translateY(-50%); }
+      .arrow-left { border-right: 8px solid rgba(192, 192, 192, 0.8); left: -7px; top: 50%; transform: translateY(-50%); }
+      .arrow-down { border-top: 8px solid rgba(192, 192, 192, 0.8); bottom: -7px; left: 50%; transform: translateX(-50%); }
+      .arrow-up { border-bottom: 8px solid rgba(192, 192, 192, 0.8); top: -7px; left: 50%; transform: translateX(-50%); }
+
+      /* Specific Element Styles */
+      .tank { background-color: rgba(59, 130, 246, 0.2); border-color: #3b82f6; }
+      .electrode-ind { background-color: #9ca3af; border-color: #6b7280; }
+      .anode-ind { background-color: rgba(239, 68, 68, 0.4); border-color: #ef4444; }
+      .cathode-ind { background-color: rgba(59, 130, 246, 0.4); border-color: #3b82f6; }
+      .gas-outlet { background-color: rgba(16, 185, 129, 0.3); border-color: #10b981; }
+      .liquid-outlet { background-color: rgba(245, 158, 11, 0.3); border-color: #f59e0b; }
+       .input-stream { background-color: rgba(139, 92, 246, 0.3); border-color: #8b5cf6; }
+        .membrane { background-color: rgba(236, 72, 153, 0.4); border-color: #ec4899; height: 80%; width: 5px; }
+        .sludge { background-color: rgba(113, 63, 18, 0.5); border-color: #713f12; }
+
+       /* Grid layout for comparison/summary sections */
+       .comparison-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+           gap: 2rem;
+       }
+        .comparison-item {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+             transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .comparison-item:hover {
+             transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+         .comparison-item h3 {
+             color: #93c5fd; /* Light blue title */
+             margin-bottom: 1rem;
+             display: flex;
+             align-items: center;
+         }
+         .comparison-item h3 i {
+             margin-right: 0.75rem;
+             color: #60a5fa;
+         }
+         .comparison-item ul {
+             list-style: none;
+             padding-left: 0;
+             color: #e0f2f7;
+         }
+          .comparison-item li {
+              margin-bottom: 0.5rem;
+              position: relative;
+              padding-left: 1.5rem;
+          }
+         .comparison-item li::before {
+             content: "\f00c"; /* Font Awesome check icon */
+             font-family: "Font Awesome 6 Free";
+             font-weight: 900;
+             position: absolute;
+             left: 0;
+             color: #34d399; /* Green check */
+         }
+
+      /* Navigation Buttons */
+        .nav-button {
+            margin-top: 3rem; /* More space above buttons */
+             padding: 0.75rem 2rem;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 9999px; /* Pill shape */
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+         .nav-button:hover {
+             background-color: #1d4ed8;
+             transform: translateY(-2px);
+         }
+          .nav-button-container {
+              margin-top: 4rem;
+              display: flex;
+              justify-content: center;
+              gap: 1rem;
+          }
+
+  </style>
+</head>
+<body class="bg-gradient-blue">
+
+  <!-- Slide 1: Title -->
+  <section id="title" class="section">
+    <div class="section-content text-center">
+      <h1 class="text-5xl md:text-6xl font-bold mb-4">Electrólisis: Forzando Reacciones Químicas No Espontáneas</h1>
+      <h2 class="text-3xl md:text-4xl font-light text-blue-200 mb-12">Aplicaciones y Principios Cuantitativos</h2>
+      <p class="text-xl mt-8 text-blue-100">Clase Interactiva</p>
+      <p class="text-lg mt-2 text-blue-100">Fecha: <span id="current-date"></span></p>
+       <div class="nav-button-container">
+           <a href="#introduction" class="nav-button">Comenzar <i class="fas fa-arrow-right ml-2"></i></a>
+       </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: Introduction -->
+  <section id="introduction" class="section">
+    <div class="section-content">
+      <h2 class="text-4xl font-bold mb-8 text-center">Introducción: Pilas Galvánicas vs Celdas Electrolíticas</h2>
+      <div class="flex flex-col md:flex-row gap-12 items-start">
+        <!-- Diagrams Side by Side -->
+        <div class="w-full md:w-1/2 flex flex-col items-center">
+            <h3 class="text-2xl font-semibold mb-4">Pila Galvánica (Espontánea)</h3>
+            <div class="cell-diagram-container mb-4">
+                <!-- Electrodes -->
+                <div class="electrode anode" style="background-color: #6b7280;">Anodo (-)</div>
+                <div class="electrode cathode" style="background-color: #6b7280; right: 80px;">Cátodo (+)</div>
+                <!-- Solution -->
+                <div class="solution"></div>
+                <!-- Power Source (Voltmeter) -->
+                 <div class="power-source voltmeter"><i class="fas fa-tachometer-alt mr-1"></i> V</div>
+                 <!-- Wires -->
+                 <div class="connection-wire wire-left" style="left: 80px; width: calc(50% - 80px - 30px);"></div>
+                 <div class="connection-wire wire-right" style="right: 80px; width: calc(50% - 80px - 30px);"></div>
+                <!-- Electron Flow -->
+                 <div class="electron-flow">
+                     <div class="electron" style="animation-delay: 0s;"></div>
+                     <div class="electron" style="animation-delay: 0.7s;"></div>
+                     <div class="electron" style="animation-delay: 1.4s;"></div>
+                 </div>
+                 <!-- Ions (Example: Zn/Cu cell) -->
+                 <div class="ion cation" style="left: 120px; bottom: 80px; animation: moveCationToCathode 4s infinite linear alternate;">Zn²⁺</div>
+                 <div class="ion anion" style="left: 260px; bottom: 120px; animation: moveAnionToAnode 4s infinite linear alternate;">SO₄²⁻</div>
+                <!-- Label -->
+                <div class="diagram-label label-galvanic">Genera Energía (ΔG < 0)</div>
+            </div>
+            <p class="mt-2 text-blue-100 text-center">Reacción Redox <span class="highlight-green">Espontánea</span></p>
+
+            <h3 class="text-2xl font-semibold mb-4 mt-10">Celda Electrolítica (No Espontánea)</h3>
+             <div class="cell-diagram-container">
+                 <!-- Electrodes -->
+                <div class="electrode anode" style="background-color: #ef4444;">Ánodo (+)</div>
+                <div class="electrode cathode" style="background-color: #3b82f6; right: 80px;">Cátodo (-)</div>
+                <!-- Solution -->
+                <div class="solution"></div>
+                 <!-- Power Source (Battery) -->
+                 <div class="power-source battery"><i class="fas fa-battery-full mr-1"></i> Fuente</div>
+                 <!-- Wires -->
+                 <div class="connection-wire wire-left" style="left: 80px; width: calc(50% - 80px - 30px);"></div>
+                 <div class="connection-wire wire-right" style="right: 80px; width: calc(50% - 80px - 30px);"></div>
+                 <!-- Electron Flow (Reversed) -->
+                  <div class="electron-flow">
+                     <div class="electron reverse" style="animation-delay: 0s;"></div>
+                     <div class="electron reverse" style="animation-delay: 0.7s;"></div>
+                     <div class="electron reverse" style="animation-delay: 1.4s;"></div>
+                 </div>
+                 <!-- Ions (Example: Electrolysis of NaCl) -->
+                 <div class="ion cation" style="left: 260px; bottom: 80px; animation: moveCationToCathodeElectro 4s infinite linear alternate;">Na⁺</div>
+                 <div class="ion anion" style="left: 120px; bottom: 120px; animation: moveAnionToAnodeElectro 4s infinite linear alternate;">Cl⁻</div>
+                 <!-- Label -->
+                <div class="diagram-label label-electrolytic">Requiere Energía (ΔG > 0)</div>
+            </div>
+            <p class="mt-2 text-blue-100 text-center">Reacción Redox <span class="highlight-orange">No Espontánea</span></p>
+        </div>
+
+        <!-- Key Points -->
+        <div class="w-full md:w-1/2 mt-8 md:mt-0">
+          <div class="key-point">
+            <div class="icon"><i class="fas fa-lightbulb"></i></div>
+            <p class="text-lg">Las <span class="highlight">pilas galvánicas</span> usan reacciones <span class="highlight-green">espontáneas</span> para generar electricidad.</p>
+          </div>
+          <div class="key-point">
+            <div class="icon"><i class="fas fa-plug"></i></div>
+            <p class="text-lg">La <span class="highlight">electrólisis</span> usa electricidad <span class="highlight">externa</span> para forzar reacciones <span class="highlight-orange">no espontáneas</span>.</p>
+          </div>
+           <div class="key-point">
+            <div class="icon"><i class="fas fa-exchange-alt"></i></div>
+            <p class="text-lg">Convierte energía <span class="highlight-orange">eléctrica</span> <i class="fas fa-long-arrow-alt-right mx-1"></i> energía <span class="highlight-green">química</span>.</p>
+          </div>
+           <div class="key-point">
+            <div class="icon"><i class="fas fa-industry"></i></div>
+            <p class="text-lg">Fundamental para obtener elementos/compuestos reactivos (Na, Cl₂, F₂, Al) o purificar metales (Cu, Zn).</p>
+          </div>
+           <div class="key-point">
+            <div class="icon"><i class="fas fa-sign"></i></div>
+            <p class="text-lg"><span class="highlight-orange">¡Ojo con los signos!</span> En electrólisis: Ánodo (+), Cátodo (-). Pero <span class="highlight">Oxidación siempre en Ánodo</span>, <span class="highlight">Reducción siempre en Cátodo</span>.</p>
+          </div>
+        </div>
+      </div>
+       <div class="nav-button-container">
+           <a href="#fundamentals" class="nav-button">Siguiente <i class="fas fa-arrow-right ml-2"></i></a>
+       </div>
+    </div>
+  </section>
+
+   <!-- Slide 3: Fundamentals -->
+   <section id="fundamentals" class="section">
+    <div class="section-content">
+        <h2 class="text-4xl font-bold mb-8 text-center">Fundamentos Teóricos de la Celda Electrolítica</h2>
+        <div class="flex flex-col md:flex-row gap-12 items-center">
+            <!-- Diagram -->
+            <div class="w-full md:w-1/2 flex justify-center">
+                 <div class="cell-diagram-container" style="height: 300px;"> <!-- Taller diagram -->
+                    <!-- Electrodes -->
+                    <div class="electrode anode" style="background-color: #ef4444; height: 200px; left: 70px;"><span class="absolute -top-6 text-red-400 font-bold">Ánodo (+)</span></div>
+                    <div class="electrode cathode" style="background-color: #3b82f6; height: 200px; right: 70px;"><span class="absolute -top-6 text-blue-400 font-bold">Cátodo (-)</span></div>
+                    <!-- Solution -->
+                    <div class="solution" style="height: 220px;"></div>
+                     <!-- Power Source -->
+                     <div class="power-source battery" style="top: 20px;"><i class="fas fa-car-battery mr-1"></i> DC</div>
+                     <!-- Wires -->
+                     <div class="connection-wire" style="left: 70px; top: 60px; width: calc(50% - 70px - 30px);"></div>
+                     <div class="connection-wire" style="right: 70px; top: 60px; width: calc(50% - 70px - 30px);"></div>
+                     <!-- Electron Flow -->
+                      <div class="electron-flow" style="left: 70px; width: calc(100% - 140px); top: 45px;">
+                         <div class="electron reverse" style="animation-delay: 0s;"></div>
+                         <div class="electron reverse" style="animation-delay: 0.6s;"></div>
+                         <div class="electron reverse" style="animation-delay: 1.2s;"></div>
+                     </div>
+                     <!-- Ions -->
+                      <div class="ion cation" style="left: 250px; bottom: 100px; animation: moveCationToCathodeElectro 5s infinite linear alternate;">Catión (+)</div>
+                     <div class="ion anion" style="left: 100px; bottom: 150px; animation: moveAnionToAnodeElectro 5s infinite linear alternate;">Anión (-)</div>
+                     <!-- Labels -->
+                     <div class="absolute bottom-10 left-70 transform -translate-x-1/2 text-center text-xs text-red-300">Oxidación <br> (Pierde e⁻)</div>
+                     <div class="absolute bottom-10 right-70 transform translate-x-1/2 text-center text-xs text-blue-300">Reducción <br> (Gana e⁻)</div>
+                     <div class="diagram-label" style="background: rgba(255, 255, 255, 0.1); color: white; bottom: 20px;">Electrolito (Iones Móviles)</div>
+                </div>
+            </div>
+            <!-- Key Points -->
+            <div class="w-full md:w-1/2">
+                <div class="key-point">
+                    <div class="icon"><i class="fas fa-power-off"></i></div>
+                    <p class="text-lg">Requiere una <span class="highlight">fuente de Corriente Continua (DC)</span> externa (batería, rectificador).</p>
+                </div>
+                <div class="key-point">
+                    <div class="icon"><i class="fas fa-link"></i></div>
+                    <p class="text-lg">Electrodos conectados a los polos de la fuente: <span class="highlight-orange">Ánodo al (+)</span>, <span class="highlight-green">Cátodo al (-)</span>.</p>
+                </div>
+                <div class="key-point">
+                    <div class="icon"><i class="fas fa-magnet"></i></div>
+                    <p class="text-lg"><span class="highlight">Cátodo (-):</span> Atrae cationes (+). Ocurre la <span class="highlight-green">Reducción</span> (ganancia de e⁻).</p>
+                </div>
+                 <div class="key-point">
+                    <div class="icon"><i class="fas fa-magnet"></i></div>
+                    <p class="text-lg"><span class="highlight">Ánodo (+):</span> Atrae aniones (-). Ocurre la <span class="highlight-orange">Oxidación</span> (pérdida de e⁻).</p>
+                </div>
+                 <div class="key-point">
+                    <div class="icon"><i class="fas fa-tint"></i></div>
+                    <p class="text-lg">El <span class="highlight">Electrolito</span> (sal fundida o disolución iónica) permite el movimiento de iones y cierra el circuito.</p>
+                </div>
+                 <div class="key-point">
+                    <div class="icon"><i class="fas fa-bolt"></i></div>
+                    <p class="text-lg">La fuente externa "bombea" electrones: los <span class="highlight-green">inyecta en el cátodo</span> y los <span class="highlight-orange">extrae del ánodo</span>, forzando la reacción.</p>
+                 </div>
+                  <div class="key-point">
+                    <div class="icon"><i class="fas fa-greater-than-equal"></i></div>
+                    <p class="text-lg">El voltaje aplicado ($V_{apl}$) debe ser <span class="highlight">mayor o igual</span> al potencial inverso de la celda ($ -E_{celda} = E_{cátodo} - E_{ánodo}$) más sobrepotenciales ($\eta$) y caída óhmica ($IR$). \( V_{apl} \geq |-E_{celda}| + \eta_{a} + \eta_{c} + IR \).</p>
+                </div>
+            </div>
+        </div>
+         <div class="nav-button-container">
+            <a href="#introduction" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Anterior</a>
+           <a href="#faraday-laws" class="nav-button">Siguiente <i class="fas fa-arrow-right ml-2"></i></a>
+       </div>
+    </div>
+  </section>
+
+    <!-- Slide 4: Faraday's Laws Theory -->
+    <section id="faraday-laws" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-8 text-center">Leyes Cuantitativas: Leyes de Faraday</h2>
+            <p class="text-xl text-blue-100 mb-12 text-center">Relacionan la cantidad de electricidad con la cantidad de sustancia transformada.</p>
+
+            <div class="comparison-grid">
+                <!-- First Law -->
+                <div class="comparison-item">
+                    <h3><i class="fas fa-chart-line"></i>Primera Ley</h3>
+                    <p class="text-blue-100 mb-4">La masa ($m$) de sustancia producida o consumida en un electrodo es <span class="highlight">directamente proporcional</span> a la cantidad de <span class="highlight">carga eléctrica ($Q$)</span> que pasa por la celda.</p>
+                    <p class="text-blue-200 text-xl mt-4 text-center">\[ m \propto Q \]</p>
+                    <p class="text-blue-100 text-sm mt-2 text-center">Más carga (Coulombs) = Más producto (gramos).</p>
+                     <div class="text-center mt-6">
+                        <a href="#faraday-1-interactive" class="text-blue-400 hover:text-blue-300 font-semibold">Ver Interactivo Ley 1 <i class="fas fa-play-circle ml-1"></i></a>
+                     </div>
+                </div>
+
+                <!-- Second Law -->
+                 <div class="comparison-item">
+                    <h3><i class="fas fa-balance-scale"></i>Segunda Ley</h3>
+                    <p class="text-blue-100 mb-4">Para una <span class="highlight">misma cantidad de carga ($Q$)</span>, las masas de diferentes sustancias producidas son <span class="highlight">proporcionales a sus pesos equivalentes ($Eq$)</span>.</p>
+                     <p class="text-blue-100 text-sm mt-2 mb-4 text-center">Peso Equivalente ($Eq$) = \( \frac{\text{Masa Molar (M)}}{\text{nº de } e^- \text{ (z)}} \)</p>
+                    <p class="text-blue-200 text-xl mt-4 text-center">\[ m \propto Eq \quad \left( Eq = \frac{M}{z} \right) \]</p>
+                    <p class="text-blue-100 text-sm mt-2 text-center">Sustancias que requieren más electrones por mol (mayor $z$) producen menos masa para la misma carga.</p>
+                     <div class="text-center mt-6">
+                        <a href="#faraday-2-interactive" class="text-blue-400 hover:text-blue-300 font-semibold">Ver Interactivo Ley 2 <i class="fas fa-play-circle ml-1"></i></a>
+                     </div>
+                </div>
+
+                <!-- Combined Law -->
+                 <div class="comparison-item">
+                    <h3><i class="fas fa-calculator"></i>Fórmula Combinada</h3>
+                    <p class="text-blue-100 mb-4">Unifica las leyes para calcular directamente la masa ($m$).</p>
+                    <p class="text-blue-200 text-lg mt-4 text-center">\[ m = \frac{M}{z \cdot F} \cdot Q \]</p>
+                     <p class="text-blue-100 text-sm mt-2">Sabiendo que \( Q = I \cdot t \), donde $I$ es corriente (Amperios) y $t$ es tiempo (segundos):</p>
+                     <p class="text-blue-200 text-lg mt-2 text-center">\[ m = \frac{M \cdot I \cdot t}{z \cdot F} \]</p>
+                     <div class="text-center mt-6">
+                        <a href="#faraday-3-interactive" class="text-blue-400 hover:text-blue-300 font-semibold">Ver Interactivo Ley 3 <i class="fas fa-play-circle ml-1"></i></a>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Faraday Constant -->
+            <div class="bg-blue-900 bg-opacity-50 p-6 rounded-lg border border-blue-400 border-opacity-30 mt-12 text-center max-w-md mx-auto">
+                 <h4 class="text-xl font-semibold mb-3"><i class="fas fa-infinity mr-2"></i>Constante de Faraday (F)</h4>
+                 <p class="text-blue-100">Es la carga eléctrica de <span class="highlight">1 mol de electrones</span>.</p>
+                 <p class="text-blue-200 text-2xl mt-2">\[ F \approx 96485 \text{ C/mol e}^- \]</p>
+                 <p class="text-blue-100 text-sm mt-1">(Para cálculos usaremos \( F = 96500 \text{ C/mol e}^- \))</p>
+            </div>
+
+             <div class="nav-button-container">
+                <a href="#fundamentals" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Anterior</a>
+                <a href="#faraday-1-interactive" class="nav-button">Interactivos Faraday <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+
+        </div>
+    </section>
+
+    <!-- Slide 5: Interactive Faraday 1 -->
+    <section id="faraday-1-interactive" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-4 text-center">Interactiva: Primera Ley de Faraday</h2>
+            <p class="text-xl text-blue-100 mb-8 text-center">\( m \propto Q \). Observa cómo la masa depositada cambia con la corriente y el tiempo.</p>
+
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <!-- Diagram -->
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="faraday-diagram">
+                        <div class="faraday-solution"></div>
+                        <div class="faraday-electrode" style="background-color: #ef4444;"><span>Ánodo (+)</span></div>
+                        <div class="faraday-electrode" style="background-color: #3b82f6; position: relative;">
+                             <div id="deposited-mass-1" class="deposited-mass"></div>
+                             <span>Cátodo (-)</span>
+                        </div>
+                         <div class="absolute top-4 left-4 text-sm text-white p-2 bg-black bg-opacity-50 rounded">Electrólisis de Cu²⁺</div>
+                    </div>
+                </div>
+                <!-- Controls -->
+                <div class="w-full md:w-1/2">
+                    <div class="interactive-controls">
+                        <h4 class="text-xl font-semibold w-full text-center mb-2 text-blue-300">Ajusta los Parámetros</h4>
+
+                        <div class="control-group">
+                            <label for="current-1">Corriente (I): <span id="current-value-1">1.0</span> A</label>
+                            <input type="range" id="current-1" value="1.0" step="0.1" min="0.1" max="5.0" class="w-full" oninput="calculateFaraday1()">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="time-1">Tiempo (t): <span id="time-value-1">10.0</span> min</label>
+                            <input type="range" id="time-1" value="10.0" step="1.0" min="1.0" max="60.0" class="w-full" oninput="calculateFaraday1()">
+                        </div>
+
+                        <div class="output-display">
+                            <p>Carga Total (Q = I * t): <span id="charge-1">0</span> C</p>
+                            <p>Masa de Cu Depositada (m): <span id="mass-1">0</span> g</p>
+                        </div>
+                    </div>
+                     <p class="mt-4 text-blue-100 text-center text-sm italic">Mueve los sliders y observa cómo la altura de la barra amarilla (masa depositada) y los valores calculados cambian.</p>
+                </div>
+            </div>
+
+             <div class="nav-button-container">
+                <a href="#faraday-laws" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Volver Leyes</a>
+               <a href="#faraday-2-interactive" class="nav-button">Siguiente Ley <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+        </div>
+    </section>
+
+     <!-- Slide 6: Interactive Faraday 2 -->
+     <section id="faraday-2-interactive" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-4 text-center">Interactiva: Segunda Ley de Faraday</h2>
+            <p class="text-xl text-blue-100 mb-8 text-center">\( m \propto Eq \). Compara la masa depositada de diferentes metales con la misma carga (1 Faraday = 96500 C).</p>
+
+             <div class="flex flex-col md:flex-row items-center gap-8">
+                 <!-- Diagram -->
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="faraday-diagram">
+                         <div class="faraday-solution"></div>
+                        <div class="faraday-electrode" style="background-color: #ef4444;"><span>Ánodo (+)</span></div>
+                        <div class="faraday-electrode" style="background-color: #3b82f6; position: relative;">
+                            <div id="deposited-mass-2" class="deposited-mass"></div>
+                            <span>Cátodo (-)</span>
+                        </div>
+                        <div class="absolute top-4 left-4 text-sm text-white p-2 bg-black bg-opacity-50 rounded">Carga Fija: 1 F</div>
+                    </div>
+                </div>
+                 <!-- Controls -->
+                <div class="w-full md:w-1/2">
+                    <div class="interactive-controls">
+                        <h4 class="text-xl font-semibold w-full text-center mb-2 text-blue-300">Selecciona el Catión Metálico</h4>
+                         <div class="control-group">
+                             <label for="ion-select-2">Ión a reducir:</label>
+                             <select id="ion-select-2" class="w-full" onchange="calculateFaraday2()">
+                                 <option value="Ag1">Ag⁺ (M: 107.9, z: 1)</option>
+                                 <option value="Cu2" selected>Cu²⁺ (M: 63.5, z: 2)</option>
+                                 <option value="Al3">Al³⁺ (M: 27.0, z: 3)</option>
+                                 <option value="Au3">Au³⁺ (M: 197.0, z: 3)</option>
+                             </select>
+                         </div>
+
+                        <div class="output-display">
+                            <p>Carga Fija (Q): <span>96500</span> C (1 Faraday)</p>
+                            <p>Equivalente Químico (Eq = M/z): <span id="equivalent-2">0</span> g/mol e⁻</p>
+                            <p>Masa Depositada (m = Eq * Q/F): <span id="mass-2">0</span> g</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-blue-100 text-center text-sm italic">Cambia el ión y observa cómo varía la masa depositada y el equivalente. Mayor 'z' implica menor masa para la misma carga.</p>
+                </div>
+            </div>
+
+             <div class="nav-button-container">
+                <a href="#faraday-1-interactive" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Ley Anterior</a>
+               <a href="#faraday-3-interactive" class="nav-button">Siguiente Ley <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+        </div>
+    </section>
+
+     <!-- Slide 7: Interactive Faraday 3 -->
+     <section id="faraday-3-interactive" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-4 text-center">Interactiva: Fórmula Combinada de Faraday</h2>
+            <p class="text-xl text-blue-100 mb-8 text-center">\[ m = \frac{M \cdot I \cdot t}{z \cdot F} \]. Calcula la cantidad de producto (masa o volumen de gas).</p>
+
+             <div class="flex flex-col md:flex-row items-center gap-8">
+                  <!-- Diagram -->
+                 <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="faraday-diagram">
+                         <div class="faraday-solution"></div>
+                        <div class="faraday-electrode" style="background-color: #ef4444;"><span>Ánodo (+)</span></div>
+                        <div class="faraday-electrode" style="background-color: #3b82f6; position: relative;">
+                             <div id="deposited-mass-3" class="deposited-mass"></div>
+                              <div id="produced-gas-3" class="gas-produced"></div>
+                             <span>Cátodo (-)</span>
+                        </div>
+                         <div class="absolute top-4 left-4 text-sm text-white p-2 bg-black bg-opacity-50 rounded">Calculadora Electrólisis</div>
+                    </div>
+                </div>
+                 <!-- Controls -->
+                <div class="w-full md:w-1/2">
+                    <div class="interactive-controls">
+                        <h4 class="text-xl font-semibold w-full text-center mb-2 text-blue-300">Configura la Electrólisis</h4>
+                        <div class="control-group">
+                             <label for="substance-select-3">Sustancia Producida:</label>
+                             <select id="substance-select-3" class="w-full" onchange="calculateFaraday3()">
+                                 <option value="Cu2" selected>Cu(s) desde Cu²⁺ (M: 63.5, z: 2)</option>
+                                 <option value="Ag1">Ag(s) desde Ag⁺ (M: 107.9, z: 1)</option>
+                                 <option value="Al3">Al(s) desde Al³⁺ (M: 27.0, z: 3)</option>
+                                 <option value="H2">H₂(g) desde H₂O/H⁺ (M: 2.0, z: 2)</option>
+                                 <option value="Cl2">Cl₂(g) desde Cl⁻ (M: 71.0, z: 2)</option>
+                                  <option value="O2">O₂(g) desde H₂O/OH⁻ (M: 32.0, z: 4)</option>
+                             </select>
+                         </div>
+                         <div class="control-group">
+                            <label for="current-3">Corriente (I): <span id="current-value-3">5.0</span> A</label>
+                            <input type="range" id="current-3" value="5.0" step="0.5" min="0.5" max="20.0" class="w-full" oninput="calculateFaraday3()">
+                        </div>
+                        <div class="control-group">
+                            <label for="time-3">Tiempo (t): <span id="time-value-3">1.0</span> h</label>
+                            <input type="range" id="time-3" value="1.0" step="0.1" min="0.1" max="5.0" class="w-full" oninput="calculateFaraday3()">
+                        </div>
+
+                        <div class="output-display">
+                            <p>Cantidad Producida: <span id="result-3">0</span></p>
+                            <p class="text-xs text-gray-400">(Volumen de gas calculado a TPE: 0°C, 1 atm)</p>
+                        </div>
+                    </div>
+                     <p class="mt-4 text-blue-100 text-center text-sm italic">Selecciona la sustancia y ajusta corriente/tiempo. La barra amarilla indica masa, la verde indica volumen de gas.</p>
+                </div>
+            </div>
+
+             <div class="nav-button-container">
+               <a href="#faraday-2-interactive" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Ley Anterior</a>
+               <a href="#exercises" class="nav-button">Ejercicios <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+        </div>
+    </section>
+
+
+     <!-- Slide 8: Exercises -->
+     <section id="exercises" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-8 text-center">Ejercicios de Aplicación</h2>
+            <p class="text-xl text-blue-100 mb-12 text-center">Apliquemos las Leyes de Faraday para resolver problemas cuantitativos.</p>
+
+            <!-- Exercise 1 -->
+            <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-blue-300"><i class="fas fa-pencil-alt mr-2"></i>Ejercicio 1: Deposición de Cobre</h3>
+                <p class="text-blue-100 mb-4">Calcule la masa de cobre metálico (Cu) que se deposita en el cátodo al pasar una corriente de <span class="highlight">2.50 Amperios</span> a través de una disolución de CuSO₄ durante <span class="highlight">50.0 minutos</span>.</p>
+                <p class="text-blue-200 italic mb-4 text-sm">Datos: Semirreacción: \( \text{Cu}^{2+}(\text{aq}) + 2e^- \rightarrow \text{Cu}(\text{s}) \), Masa Molar Cu = 63.5 g/mol, F = 96500 C/mol e⁻.</p>
+
+                <div class="text-center mt-4">
+                     <button class="toggle-calculation px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300"><i class="fas fa-eye mr-2"></i>Mostrar Cálculo</button>
+                     <div class="calculation-steps mt-4">
+                         <h4 class="text-xl font-semibold mb-2">Pasos del Cálculo:</h4>
+                         <pre>
+1. Convertir tiempo a segundos:
+   t = 50.0 min * (60 s / 1 min) = 3000 s
+
+2. Calcular la carga total (Q):
+   Q = I * t
+   Q = 2.50 A * 3000 s = 7500 C
+
+3. Determinar 'z' (moles de e⁻ por mol de producto):
+   De la semirreacción: Cu²⁺ + 2e⁻ → Cu(s), se necesitan z = 2 moles de e⁻ por cada mol de Cu.
+
+4. Aplicar la fórmula de Faraday:
+   m = (M * I * t) / (z * F)
+   m = (63.5 g/mol * 2.50 A * 3000 s) / (2 * 96500 C/mol e⁻)
+   m = (63.5 * 7500) / 193000 g
+   m = 476250 / 193000 g
+   m ≈ 2.467 g
+
+Respuesta: Se depositan aproximadamente 2.47 g de Cobre metálico.
+                         </pre>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Exercise 2 -->
+            <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30">
+                <h3 class="text-2xl font-semibold mb-4 text-blue-300"><i class="fas fa-flask mr-2"></i>Ejercicio 2: Electrólisis del Agua</h3>
+                <p class="text-blue-100 mb-4">Se electroliza agua (con H₂SO₄ diluido) usando una corriente de <span class="highlight">1.26 A</span> durante <span class="highlight">7.44 horas</span>. Calcule el volumen total de gases (H₂ y O₂) generados, medidos a TPE (Temperatura y Presión Estándar: 0°C y 1 atm).</p>
+                 <p class="text-blue-200 italic mb-1 text-sm">Reacción Global: \( 2\text{H}_2\text{O}(l) \rightarrow 2\text{H}_2(g) + \text{O}_2(g) \)</p>
+                 <p class="text-blue-200 italic mb-4 text-sm">Semirreacciones: Cátodo (-): \( 2\text{H}_2\text{O} + 2e^- \rightarrow \text{H}_2(g) + 2\text{OH}^- \) (z=2 para H₂). Ánodo (+): \( 2\text{H}_2\text{O} \rightarrow \text{O}_2(g) + 4\text{H}^+ + 4e^- \) (z=4 para O₂).</p>
+                 <p class="text-blue-200 italic mb-4 text-sm">Dato: Volumen molar de gas a TPE ≈ 22.4 L/mol.</p>
+
+                <div class="text-center mt-4">
+                     <button class="toggle-calculation px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300"><i class="fas fa-eye mr-2"></i>Mostrar Cálculo</button>
+                     <div class="calculation-steps mt-4">
+                         <h4 class="text-xl font-semibold mb-2">Pasos del Cálculo:</h4>
+                         <pre>
+1. Convertir tiempo a segundos:
+   t = 7.44 h * (3600 s / 1 h) = 26784 s
+
+2. Calcular la carga total (Q):
+   Q = I * t
+   Q = 1.26 A * 26784 s ≈ 33748 C
+
+3. Calcular los moles de electrones totales (n_e⁻):
+   n_e⁻ = Q / F
+   n_e⁻ = 33748 C / 96500 C/mol e⁻ ≈ 0.3497 mol e⁻
+
+4. Calcular moles de H₂ (usando z=2):
+   Moles H₂ = n_e⁻ / z_H₂ = 0.3497 mol e⁻ / 2 mol e⁻/mol H₂ ≈ 0.1749 mol H₂
+
+5. Calcular moles de O₂ (usando z=4):
+   Moles O₂ = n_e⁻ / z_O₂ = 0.3497 mol e⁻ / 4 mol e⁻/mol O₂ ≈ 0.0874 mol O₂
+   (Nota: Moles H₂ ≈ 2 * Moles O₂, consistente con la estequiometría 2:1)
+
+6. Calcular volúmenes a TPE (V = n * 22.4 L/mol):
+   Volumen H₂ = 0.1749 mol * 22.4 L/mol ≈ 3.92 L
+   Volumen O₂ = 0.0874 mol * 22.4 L/mol ≈ 1.96 L
+
+7. Calcular volumen total de gases:
+   Volumen Total = Volumen H₂ + Volumen O₂
+   Volumen Total ≈ 3.92 L + 1.96 L ≈ 5.88 L
+
+Respuesta: Se generan aproximadamente 3.92 L de H₂ y 1.96 L de O₂, para un volumen total de 5.88 L de gases a TPE.
+                         </pre>
+                     </div>
+                </div>
+            </div>
+
+             <div class="nav-button-container">
+               <a href="#faraday-3-interactive" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Ley Anterior</a>
+               <a href="#industrial-applications" class="nav-button">Aplicaciones Industriales <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+
+        </div>
+    </section>
+
+     <!-- Slide 9: Industrial Applications Overview -->
+     <section id="industrial-applications" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-8 text-center">Aplicaciones Industriales Clave</h2>
+            <p class="text-xl text-blue-100 mb-12 text-center">La electrólisis es fundamental en la producción a gran escala de materiales esenciales.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8"> <!-- Adjusted grid for better spacing -->
+                <!-- Zinc Production -->
+                <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col">
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-300"><i class="fas fa-industry mr-2"></i>Producción de Zinc (Electroobtención)</h3>
+                    <p class="text-blue-100 mb-4 text-sm flex-grow">Obtención de Zn metálico de alta pureza (>99.9%) por electrólisis de disoluciones de ZnSO₄ (obtenidas de minerales). Cátodos de Al, Ánodos de Pb-Ag. \( \text{Zn}^{2+} + 2e^- \rightarrow \text{Zn}(s) \)</p>
+                     <div class="text-center mt-auto">
+                        <a href="#zinc-production-diagram" class="text-blue-400 hover:text-blue-300 font-semibold">Ver Diagrama <i class="fas fa-project-diagram ml-1"></i></a>
+                    </div>
+                </div>
+
+                <!-- Chlor-Alkali -->
+                 <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col">
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-300"><i class="fas fa-flask mr-2"></i>Proceso Cloro-Álcali</h3>
+                    <p class="text-blue-100 mb-4 text-sm flex-grow">Producción simultánea de Cl₂, H₂ y NaOH por electrólisis de salmuera (NaCl acuoso). Esencial para industria química (PVC, papel, jabón). \( 2\text{NaCl} + 2\text{H}_2\text{O} \rightarrow \text{Cl}_2 + \text{H}_2 + 2\text{NaOH} \).</p>
+                     <div class="text-center mt-auto">
+                        <a href="#chlor-alkali-diagram" class="text-blue-400 hover:text-blue-300 font-semibold">Ver Diagrama <i class="fas fa-project-diagram ml-1"></i></a>
+                    </div>
+                </div>
+
+                <!-- Copper Refining -->
+                 <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col">
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-300"><i class="fas fa-layer-group mr-2"></i>Refinación de Cobre (Electrorefino)</h3>
+                    <p class="text-blue-100 mb-4 text-sm flex-grow">Purificación de cobre bruto (~99%) para obtener Cu de alta pureza (>99.99%) para uso eléctrico. Ánodo de Cu impuro (se disuelve), Cátodo de Cu puro (se deposita). \( \text{Cu}(\text{impuro}) \rightarrow \text{Cu}(\text{puro}) \).</p>
+                     <div class="text-center mt-auto">
+                        <a href="#copper-refining-diagram" class="text-blue-400 hover:text-blue-300 font-semibold">Ver Diagrama <i class="fas fa-project-diagram ml-1"></i></a>
+                    </div>
+                </div>
+
+                <!-- Fluorine Production -->
+                 <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col">
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-300"><i class="fas fa-atom mr-2"></i>Producción de Flúor</h3>
+                    <p class="text-blue-100 mb-4 text-sm flex-grow">Único método para obtener F₂ gaseoso (el elemento más reactivo). Electrólisis de HF anhidro disuelto en KF fundido (mezcla KHF₂). \( 2\text{HF} \rightarrow \text{H}_2 + \text{F}_2 \). Proceso peligroso y complejo.</p>
+                     <div class="text-center mt-auto">
+                        <a href="#fluorine-production-diagram" class="text-blue-400 hover:text-blue-300 font-semibold">Ver Diagrama <i class="fas fa-project-diagram ml-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+             <div class="nav-button-container">
+               <a href="#exercises" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Ejercicios</a>
+               <a href="#zinc-production-diagram" class="nav-button">Diagramas Industriales <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+        </div>
+    </section>
+
+     <!-- Slides 10-13: Industrial Diagrams (Individual Sections) -->
+     <!-- Slide 10: Zinc Production Diagram -->
+     <section id="zinc-production-diagram" class="section">
+         <div class="section-content">
+             <h2 class="text-4xl font-bold mb-8 text-center">Diagrama: Producción de Zinc (Electroobtención)</h2>
+             <div class="industrial-diagram-container">
+                 <!-- Tank -->
+                 <div class="diagram-element tank" style="width: 90%; height: 70%; bottom: 10%; left: 5%;">Celda Electrolítica</div>
+                 <!-- Electrodes -->
+                 <div class="diagram-element anode-ind electrode-ind" style="width: 15px; height: 55%; left: 25%; bottom: 15%;">Ánodo (+) <br> Pb-Ag <br> (Produce O₂)</div>
+                 <div class="diagram-element cathode-ind electrode-ind" style="width: 15px; height: 55%; right: 25%; bottom: 15%;">Cátodo (-) <br> Al <br> (Deposita Zn)</div>
+                 <!-- Inputs/Outputs -->
+                 <div class="diagram-element input-stream" style="top: 15%; left: 5%;">Entrada <br> ZnSO₄ (aq)</div>
+                 <div class="diagram-element liquid-outlet" style="bottom: 5%; right: 5%;">Salida <br> Electrolito <br> (con H₂SO₄)</div>
+                 <div class="diagram-element gas-outlet" style="top: 10%; left: 25%; transform: translateX(-50%);">Salida O₂(g)</div>
+                  <div class="diagram-element" style="bottom: 15%; right: 15%; background: #cbd5e1; color: #1e3a8a;">Depósito <br> Zn(s)</div>
+                 <!-- Streams -->
+                 <div class="process-stream" style="width: 15%; top: 20%; left: 20%;"><div class="stream-arrow arrow-right"></div></div> /* ZnSO4 in */
+                 <div class="process-stream vertical" style="height: 20%; top: 25%; left: 25%; transform: translateX(-50%);"><div class="stream-arrow arrow-up"></div></div> /* O2 out */
+                 <div class="process-stream" style="width: 15%; bottom: 10%; right: 20%;"><div class="stream-arrow arrow-left"></div></div> /* Acid out */
+                  <!-- Reactions -->
+                   <p class="absolute bottom-5 left-15 text-xs text-red-300">Ánodo: 2H₂O → O₂ + 4H⁺ + 4e⁻</p>
+                   <p class="absolute bottom-5 right-15 text-xs text-blue-300">Cátodo: Zn²⁺ + 2e⁻ → Zn</p>
+             </div>
+              <div class="nav-button-container">
+                <a href="#industrial-applications" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Volver Aplicaciones</a>
+                 <a href="#chlor-alkali-diagram" class="nav-button">Siguiente Diagrama <i class="fas fa-arrow-right ml-2"></i></a>
+            </div>
+         </div>
+     </section>
+
+      <!-- Slide 11: Chlor-Alkali Diagram -->
+      <section id="chlor-alkali-diagram" class="section">
+         <div class="section-content">
+             <h2 class="text-4xl font-bold mb-8 text-center">Diagrama: Proceso Cloro-Álcali (Celda de Membrana)</h2>
+             <div class="industrial-diagram-container">
+                  <!-- Compartments -->
+                  <div class="diagram-element tank" style="width: 40%; height: 70%; bottom: 10%; left: 5%;">Compartimento Anódico</div>
+                   <div class="diagram-element tank" style="width: 40%; height: 70%; bottom: 10%; right: 5%;">Compartimento Catódico</div>
+                  <!-- Membrane -->
+                   <div class="diagram-element membrane" style="left: 50%; transform: translateX(-50%); bottom: 10%; height: 70%;">Membrana <br> Selectiva <br> (Na⁺)</div>
+                 <!-- Electrodes -->
+                 <div class="diagram-element anode-ind electrode-ind" style="width: 15px; height: 55%; left: 25%; bottom: 15%;">Ánodo (+) <br> (Produce Cl₂)</div>
+                 <div class="diagram-element cathode-ind electrode-ind" style="width: 15px; height: 55%; right: 25%; bottom: 15%;">Cátodo (-) <br> (Produce H₂ y OH⁻)</div>
+                 <!-- Inputs/Outputs -->
+                 <div class="diagram-element input-stream" style="top: 15%; left: 5%;">Entrada <br> Salmuera (NaCl)</div>
+                 <div class="diagram-element" style="bottom: 5%; left: 5%;">Salida <br> Salmuera Diluida</div>
+                  <div class="diagram-element input-stream" style="top: 15%; right: 5%;">Entrada <br> Agua</div>
+                 <div class="diagram-element liquid-outlet" style="bottom: 5%; right: 5%;">Salida <br> NaOH (aq)</div>
+                 <div class="diagram-element gas-outlet" style="top: 10%; left: 25%; transform: translateX(-50%);">Salida Cl₂(g)</div>
+                 <div class="diagram-element gas-outlet" style="top: 10%; right: 25%; transform: translateX(50%);">Salida H₂(g)</div>
+                 <!-- Streams (Simplified) -->
+                 <div class="process-stream vertical" style="height: 20%; top: 25%; left: 25%; transform: translateX(-50%);"><div class="stream-arrow arrow-up"></div></div> /* Cl2 out */
+                 <div class="process-stream vertical" style="height: 20%; top: 25%; right: 25%; transform: translateX(50%);"><div class="stream-arrow arrow-up"></div></div> /* H2 out */
+                 <!-- Reactions -->
+                   <p class="absolute bottom-5 left-10 text-xs text-red-300">Ánodo: 2Cl⁻ → Cl₂ + 2e⁻</p>
+                   <p class="absolute bottom-5 right-10 text-xs text-blue-300">Cátodo: 2H₂O + 2e⁻ → H₂ + 2OH⁻</p>
+             </div>
+              <div class="nav-button-container">
+                 <a href="#zinc-production-diagram" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Diagrama Anterior</a>
+                <a href="#copper-refining-diagram" class="nav-button">Siguiente Diagrama <i class="fas fa-arrow-right ml-2"></i></a>
+            </div>
+         </div>
+     </section>
+
+      <!-- Slide 12: Copper Refining Diagram -->
+      <section id="copper-refining-diagram" class="section">
+         <div class="section-content">
+             <h2 class="text-4xl font-bold mb-8 text-center">Diagrama: Refinación Electrolítica de Cobre</h2>
+             <div class="industrial-diagram-container">
+                  <!-- Tank -->
+                 <div class="diagram-element tank" style="width: 90%; height: 70%; bottom: 10%; left: 5%;">Celda de Electrorefino <br> (Electrolito: CuSO₄ + H₂SO₄)</div>
+                 <!-- Electrodes -->
+                 <div class="diagram-element anode-ind electrode-ind" style="width: 30px; /* Thicker anode */ height: 55%; left: 25%; bottom: 15%;">Ánodo (+) <br> Cu Impuro <br> (Se disuelve)</div>
+                 <div class="diagram-element cathode-ind electrode-ind" style="width: 15px; height: 55%; right: 25%; bottom: 15%;">Cátodo (-) <br> Cu Puro <br> (Crece)</div>
+                 <!-- Sludge -->
+                 <div class="diagram-element sludge" style="width: 30%; height: 10%; bottom: 5%; left: 17%;">Barros Anódicos <br> (Ag, Au, Pt...)</div>
+                 <!-- Inputs/Outputs (Simplified - mainly shows process) -->
+                 <div class="diagram-element" style="top: 10%; left: 10%; background-color: rgba(239, 68, 68, 0.2);">Entrada <br> Ánodos Impuros</div>
+                  <div class="diagram-element" style="top: 10%; right: 10%; background-color: rgba(59, 130, 246, 0.2);">Salida <br> Cátodos Puros</div>
+                  <!-- Ion movement indication -->
+                  <p class="absolute top-50 left-50 transform -translate-x-1/2 -translate-y-1/2 text-lg text-blue-300 font-bold">Cu²⁺ →</p>
+                 <!-- Reactions -->
+                   <p class="absolute bottom-5 left-15 text-xs text-red-300">Ánodo: Cu(impuro) → Cu²⁺ + 2e⁻ (+ otras impurezas)</p>
+                   <p class="absolute bottom-5 right-15 text-xs text-blue-300">Cátodo: Cu²⁺ + 2e⁻ → Cu(puro)</p>
+             </div>
+              <div class="nav-button-container">
+                <a href="#chlor-alkali-diagram" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Diagrama Anterior</a>
+                <a href="#fluorine-production-diagram" class="nav-button">Siguiente Diagrama <i class="fas fa-arrow-right ml-2"></i></a>
+            </div>
+         </div>
+     </section>
+
+      <!-- Slide 13: Fluorine Production Diagram -->
+      <section id="fluorine-production-diagram" class="section">
+         <div class="section-content">
+             <h2 class="text-4xl font-bold mb-8 text-center">Diagrama: Producción de Flúor (Proceso Moissan)</h2>
+             <div class="industrial-diagram-container">
+                  <!-- Tank -->
+                 <div class="diagram-element tank" style="width: 90%; height: 70%; bottom: 10%; left: 5%;">Celda de Acero <br> (Electrolito: KF·2HF fundido ~90°C)</div>
+                 <!-- Barrier -->
+                  <div class="diagram-element" style="width: 70%; height: 5px; background: #a0aec0; left: 15%; top: 25%;">Falda separadora de gases</div>
+                 <!-- Electrodes -->
+                 <div class="diagram-element anode-ind electrode-ind" style="width: 15px; height: 45%; left: 25%; bottom: 15%; background: #4b5563;">Ánodo (+) <br> Carbono <br> (Produce F₂)</div>
+                 <div class="diagram-element cathode-ind electrode-ind" style="width: 15px; height: 45%; right: 25%; bottom: 15%;">Cátodo (-) <br> Acero <br> (Produce H₂)</div>
+                 <!-- Inputs/Outputs -->
+                 <div class="diagram-element input-stream" style="top: 50%; left: 5%;">Entrada HF</div>
+                 <div class="diagram-element gas-outlet" style="top: 10%; left: 25%; transform: translateX(-50%);">Salida F₂(g)</div>
+                 <div class="diagram-element gas-outlet" style="top: 10%; right: 25%; transform: translateX(50%);">Salida H₂(g)</div>
+                 <!-- Streams -->
+                 <div class="process-stream vertical" style="height: 10%; top: 15%; left: 25%; transform: translateX(-50%);"><div class="stream-arrow arrow-up"></div></div> /* F2 out */
+                 <div class="process-stream vertical" style="height: 10%; top: 15%; right: 25%; transform: translateX(50%);"><div class="stream-arrow arrow-up"></div></div> /* H2 out */
+                 <!-- Reactions -->
+                   <p class="absolute bottom-5 left-15 text-xs text-red-300">Ánodo: 2F⁻ → F₂ + 2e⁻</p>
+                   <p class="absolute bottom-5 right-15 text-xs text-blue-300">Cátodo: 2HF + 2e⁻ → H₂ + 2F⁻ (simplificado)</p>
+             </div>
+              <div class="nav-button-container">
+                 <a href="#copper-refining-diagram" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Diagrama Anterior</a>
+                <a href="#technical-aspects" class="nav-button">Aspectos Técnicos <i class="fas fa-arrow-right ml-2"></i></a>
+            </div>
+         </div>
+     </section>
+
+
+     <!-- Slide 14: Technical Aspects -->
+     <section id="technical-aspects" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-8 text-center">Aspectos Técnicos Clave</h2>
+            <p class="text-xl text-blue-100 mb-12 text-center">Consideraciones en el diseño y operación de celdas industriales.</p>
+
+             <div class="comparison-grid">
+                 <!-- Electrodes -->
+                 <div class="comparison-item">
+                    <h3><i class="fas fa-cogs"></i>Electrodos y Materiales</h3>
+                    <ul class="list-disc list-inside text-sm">
+                        <li><span class="font-semibold">Selección Crítica:</span> Depende del proceso, T, P, corrosividad.</li>
+                        <li><span class="font-semibold">Inertes:</span> No reaccionan (Grafito, Pt, Ti con recubrimiento DSA® para Cl₂/O₂).</li>
+                        <li><span class="font-semibold">Activos/Consumibles:</span> Participan en la reacción (Ánodo de Cu impuro, ánodos de Al/Fe en electrocoagulación).</li>
+                        <li><span class="font-semibold">Propiedades:</span> Buena conductividad, resistencia a corrosión, estabilidad dimensional, bajo costo (idealmente).</li>
+                    </ul>
+                 </div>
+
+                  <!-- Membranes -->
+                  <div class="comparison-item">
+                    <h3><i class="fas fa-filter"></i>Diafragmas y Membranas</h3>
+                     <ul class="list-disc list-inside text-sm">
+                        <li><span class="font-semibold">Función:</span> Separar compartimentos anódico y catódico.</li>
+                        <li><span class="font-semibold">Objetivo:</span> Prevenir mezcla de productos (ej. Cl₂/H₂), asegurar pureza, mejorar eficiencia.</li>
+                        <li><span class="font-semibold">Diafragmas:</span> Porosos (asbesto, polímeros), permiten paso de iones y solvente. Menos selectivos.</li>
+                        <li><span class="font-semibold">Membranas Iónicas:</span> Selectivas (ej. Nafion®), permiten paso solo de cationes (Na⁺, H⁺) o aniones. Más eficientes y puras, pero más caras y sensibles. Clave en Cloro-Álcali y Electrolizadores PEM.</li>
+                    </ul>
+                 </div>
+
+                  <!-- Energy Efficiency -->
+                  <div class="comparison-item">
+                    <h3><i class="fas fa-charging-station"></i>Eficiencia Energética</h3>
+                     <ul class="list-disc list-inside text-sm">
+                        <li><span class="font-semibold">Proceso Electrointensivo:</span> Costo eléctrico es dominante en muchos casos (Al, Zn, Cl₂).</li>
+                        <li><span class="font-semibold">Voltaje Real > Teórico:</span> \( V_{apl} = |-E_{celda}| + \eta_{a} + \eta_{c} + IR \).
+                            <ul class="list-disc list-inside ml-4 mt-1">
+                                <li><span class="highlight-orange">Sobrepotenciales ($\eta$):</span> Energía extra para vencer barreras cinéticas en electrodos (especialmente gases O₂, H₂, F₂).</li>
+                                <li><span class="highlight-orange">Caída Óhmica (IR):</span> Pérdida de voltaje por resistencia del electrolito, electrodos, contactos.</li>
+                            </ul>
+                        </li>
+                         <li><span class="font-semibold">Eficiencia de Corriente ($\%I$):</span> % de carga usada para el producto deseado vs. reacciones secundarias.</li>
+                        <li><span class="font-semibold">Consumo Específico (kWh/kg):</span> Métrica clave = Energía Total / Masa Producida. Minimizarlo es crucial.</li>
+                     </ul>
+                 </div>
+
+                  <!-- Other Factors -->
+                  <div class="comparison-item">
+                    <h3><i class="fas fa-thermometer-half"></i>Otros Factores</h3>
+                     <ul class="list-disc list-inside text-sm">
+                         <li><span class="font-semibold">Temperatura:</span> Afecta conductividad, cinética y corrosión. Controlada para optimizar.</li>
+                         <li><span class="font-semibold">Densidad de Corriente (A/m²):</span> Impacta velocidad de producción, calidad del depósito y pérdidas de voltaje.</li>
+                         <li><span class="font-semibold">Concentración y pH:</span> Afectan conductividad, reacciones secundarias y sobrepotenciales.</li>
+                          <li><span class="font-semibold">Agitación/Flujo:</span> Mejora transporte de masa, evita agotamiento local de iones.</li>
+                    </ul>
+                 </div>
+             </div>
+
+             <div class="nav-button-container">
+               <a href="#fluorine-production-diagram" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Diagrama Anterior</a>
+               <a href="#other-applications" class="nav-button">Otras Aplicaciones <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+        </div>
+    </section>
+
+    <!-- Slide 15: Other Applications -->
+    <section id="other-applications" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-8 text-center">Otras Aplicaciones Importantes</h2>
+            <p class="text-xl text-blue-100 mb-12 text-center">La electrólisis tiene usos más allá de la producción química básica.</p>
+
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 <!-- Electroplating -->
+                 <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col items-center text-center">
+                    <div class="icon mb-4"><i class="fas fa-fill-drip text-3xl text-yellow-400"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3">Galvanoplastia</h3>
+                    <p class="text-blue-100 text-sm">Recubrimiento de objetos con una fina capa metálica (Cr, Ni, Ag, Au) para protección, estética o conductividad. El objeto es el <span class="highlight-green">cátodo</span>.</p>
+                 </div>
+                 <!-- Anodizing -->
+                  <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col items-center text-center">
+                    <div class="icon mb-4"><i class="fas fa-paint-roller text-3xl text-gray-400"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3">Anodizado</h3>
+                    <p class="text-blue-100 text-sm">Crecimiento controlado de una capa de óxido protectora (ej. Al₂O₃ sobre Al) para mejorar resistencia a corrosión y permitir coloración. El objeto es el <span class="highlight-orange">ánodo</span>.</p>
+                 </div>
+                 <!-- Electrosynthesis -->
+                  <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col items-center text-center">
+                    <div class="icon mb-4"><i class="fas fa-microscope text-3xl text-purple-400"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3">Electrosíntesis</h3>
+                    <p class="text-blue-100 text-sm">Síntesis de compuestos orgánicos e inorgánicos usando electricidad como "reactivo limpio". Rutas selectivas y eficientes para ciertos productos.</p>
+                 </div>
+                 <!-- Water Treatment -->
+                 <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col items-center text-center">
+                    <div class="icon mb-4"><i class="fas fa-water text-3xl text-blue-400"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3">Tratamiento de Aguas</h3>
+                    <p class="text-blue-100 text-sm">Electrocoagulación (eliminar coloides), Electroflotación, Electrooxidación (destruir contaminantes), Cloración in situ (desinfección).</p>
+                 </div>
+                 <!-- Battery Charging -->
+                  <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col items-center text-center">
+                    <div class="icon mb-4"><i class="fas fa-battery-full text-3xl text-green-400"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3">Carga de Baterías</h3>
+                    <p class="text-blue-100 text-sm">El proceso de carga de baterías recargables (Pb-ácido, Li-ion) es una <span class="highlight-orange">electrólisis forzada</span> que revierte la reacción de descarga.</p>
+                 </div>
+                  <!-- Hydrogen Production -->
+                  <div class="bg-blue-900 bg-opacity-40 p-6 rounded-lg border border-blue-400 border-opacity-30 flex flex-col items-center text-center">
+                    <div class="icon mb-4"><i class="fas fa-wind text-3xl text-cyan-400"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3">Hidrógeno Verde</h3>
+                    <p class="text-blue-100 text-sm">Electrólisis del agua usando electricidad de fuentes renovables para producir H₂ como vector energético limpio y sostenible.</p>
+                 </div>
+             </div>
+
+             <div class="nav-button-container">
+               <a href="#technical-aspects" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Aspectos Técnicos</a>
+               <a href="#summary" class="nav-button">Resumen <i class="fas fa-arrow-right ml-2"></i></a>
+           </div>
+        </div>
+    </section>
+
+     <!-- Slide 16: Summary -->
+     <section id="summary" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-8 text-center">Resumen y Puntos Clave</h2>
+
+            <div class="comparison-grid">
+                <!-- Galvanic vs Electrolytic -->
+                <div class="comparison-item">
+                    <h3><i class="fas fa-balance-scale"></i>Galvánicas vs Electrolíticas</h3>
+                     <ul>
+                        <li>Galvánicas: Espontáneas ($\Delta G < 0$), <span class="highlight-green">generan</span> electricidad. Ánodo (-), Cátodo (+).</li>
+                        <li>Electrolíticas: No espontáneas ($\Delta G > 0$), <span class="highlight-orange">requieren</span> electricidad. Ánodo (+), Cátodo (-).</li>
+                    </ul>
+                </div>
+                 <!-- Anode/Cathode Definition -->
+                 <div class="comparison-item">
+                    <h3><i class="fas fa-exchange-alt"></i>Definiciones Universales</h3>
+                     <ul>
+                        <li><span class="highlight-orange">Oxidación</span> siempre en el <span class="highlight-orange">Ánodo</span> (pérdida e⁻).</li>
+                        <li><span class="highlight-green">Reducción</span> siempre en el <span class="highlight-green">Cátodo</span> (ganancia e⁻).</li>
+                        <li>Los signos (+/-) dependen de si la celda genera o consume energía.</li>
+                    </ul>
+                </div>
+                 <!-- Faraday's Laws -->
+                 <div class="comparison-item">
+                    <h3><i class="fas fa-calculator"></i>Leyes de Faraday</h3>
+                     <ul>
+                        <li>Relacionan <span class="highlight">carga (Q)</span> con <span class="highlight">masa (m)</span> producida.</li>
+                        <li>Fórmula clave: \( m = \frac{M \cdot I \cdot t}{z \cdot F} \).</li>
+                         <li>Permiten cálculos estequiométricos precisos.</li>
+                    </ul>
+                </div>
+                 <!-- Key Applications -->
+                 <div class="comparison-item">
+                    <h3><i class="fas fa-industry"></i>Aplicaciones Clave</h3>
+                     <ul>
+                        <li>Producción: Al, Zn, Na, Mg, Cl₂, H₂, NaOH, F₂.</li>
+                        <li>Purificación: Refino de Cu, Ni.</li>
+                        <li>Superficies: Galvanoplastia, Anodizado.</li>
+                         <li>Energía: Carga de baterías, producción de H₂ verde.</li>
+                    </ul>
+                </div>
+            </div>
+
+             <div class="nav-button-container">
+               <a href="#other-applications" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Otras Aplicaciones</a>
+               <a href="#thank-you" class="nav-button">Finalizar <i class="fas fa-check-circle ml-2"></i></a>
+           </div>
+
+        </div>
+    </section>
+
+     <!-- Slide 17: Thank You -->
+     <section id="thank-you" class="section" style="border-bottom: none;">
+        <div class="section-content text-center">
+            <h2 class="text-5xl font-bold mb-8 text-blue-300">¡Gracias por su atención!</h2>
+            <p class="text-2xl text-blue-100 mb-12">Espero que esta presentación interactiva haya sido útil para comprender la electrólisis, sus principios y su vasta importancia industrial.</p>
+             <p class="text-3xl font-semibold text-yellow-400 animate-pulse">¿Preguntas?</p>
+              <div class="mt-16">
+                 <i class="fas fa-flask fa-3x text-blue-400 mx-4"></i>
+                 <i class="fas fa-bolt fa-3x text-yellow-400 mx-4"></i>
+                 <i class="fas fa-industry fa-3x text-gray-400 mx-4"></i>
+             </div>
+             <div class="nav-button-container">
+                <a href="#title" class="nav-button"><i class="fas fa-home mr-2"></i> Volver al Inicio</a>
+            </div>
+         </div>
+    </section>
+
+
+  <script>
+    // --- Basic Setup ---
+    // Set current date
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Toggle calculation steps visibility
+    document.querySelectorAll('.toggle-calculation').forEach(button => {
+        button.addEventListener('click', function() {
+            const calculationSteps = this.nextElementSibling; // The div right after the button
+             const icon = this.querySelector('i');
+            if (calculationSteps.style.display === 'none' || calculationSteps.style.display === '') {
+                calculationSteps.style.display = 'block';
+                this.innerHTML = '<i class="fas fa-eye-slash mr-2"></i>Ocultar Cálculo';
+            } else {
+                calculationSteps.style.display = 'none';
+                this.innerHTML = '<i class="fas fa-eye mr-2"></i>Mostrar Cálculo';
+            }
+        });
+    });
+
+    // --- Faraday's Laws Interactive Calculations ---
+
+    // Data for substances (M: Molar Mass, z: electrons transferred per mole of product)
+    const substances = {
+        Cu2: { M: 63.5, z: 2, type: 'mass', unit: 'g', name: 'Cu(s)' },
+        Ag1: { M: 107.9, z: 1, type: 'mass', unit: 'g', name: 'Ag(s)' },
+        Al3: { M: 27.0, z: 3, type: 'mass', unit: 'g', name: 'Al(s)' },
+        Au3: { M: 197.0, z: 3, type: 'mass', unit: 'g', name: 'Au(s)' },
+        H2:  { M: 2.0, z: 2, type: 'volume', unit: 'L', name: 'H₂(g)' }, // 2e- per H2
+        Cl2: { M: 71.0, z: 2, type: 'volume', unit: 'L', name: 'Cl₂(g)' }, // 2e- per Cl2
+        O2:  { M: 32.0, z: 4, type: 'volume', unit: 'L', name: 'O₂(g)' }  // 4e- per O2
+    };
+    const F = 96500; // Faraday constant in C/mol e-
+    const MOLAR_VOLUME_STP = 22.414; // Molar volume at STP (0°C, 1 atm) in L/mol
+
+    // Helper to update visual representation
+    function updateVisual(massElementId, gasElementId, value, type, maxValue) {
+        const massElement = document.getElementById(massElementId);
+        const gasElement = document.getElementById(gasElementId);
+        const diagramHeight = 200; // Height of the electrode visualization area in px
+
+        let height = 0;
+        if (value > 0 && maxValue > 0) {
+             height = Math.min((value / maxValue) * diagramHeight, diagramHeight);
+        }
+         height = Math.max(0, height); // Ensure height is not negative
+
+        if (type === 'mass') {
+            massElement.style.height = height + 'px';
+            gasElement.style.height = '0px'; // Reset gas visualization
+        } else if (type === 'volume') {
+            gasElement.style.height = height + 'px';
+            massElement.style.height = '0px'; // Reset mass visualization
+             // Position gas simulation from the top of the electrode
+             // gasElement.style.top = (diagramHeight - height) + 'px'; // This might look better if origin is top
+        } else {
+             massElement.style.height = '0px';
+             gasElement.style.height = '0px';
+        }
+    }
+
+    // Faraday's First Law Calculation
+    function calculateFaraday1() {
+        const currentInput = document.getElementById('current-1');
+        const timeInput = document.getElementById('time-1');
+        const currentValueSpan = document.getElementById('current-value-1');
+        const timeValueSpan = document.getElementById('time-value-1');
+
+        const current = parseFloat(currentInput.value);
+        const timeMinutes = parseFloat(timeInput.value);
+        const timeSeconds = timeMinutes * 60;
+
+        currentValueSpan.textContent = current.toFixed(1);
+        timeValueSpan.textContent = timeMinutes.toFixed(1);
+
+        const charge = current * timeSeconds; // Q = I * t
+        const elementData = substances['Cu2']; // Fixed to Copper for this example
+        const mass = (elementData.M * charge) / (elementData.z * F);
+
+        document.getElementById('charge-1').textContent = charge.toFixed(0);
+        document.getElementById('mass-1').textContent = mass.toFixed(3);
+
+        // Update visual (max mass approx 5A * 60min)
+        const maxMassExpected = (substances['Cu2'].M * 5.0 * (60*60)) / (substances['Cu2'].z * F); // Max mass for 5A, 60min
+        updateVisual('deposited-mass-1', null, mass, 'mass', maxMassExpected * 1.1); // Add 10% buffer
+    }
+
+    // Faraday's Second Law Calculation
+    function calculateFaraday2() {
+        const selectedIonKey = document.getElementById('ion-select-2').value;
+        const elementData = substances[selectedIonKey];
+
+        const charge = F; // Fixed charge: 1 Faraday (1 mol e-)
+        const equivalentWeight = elementData.M / elementData.z;
+        const mass = equivalentWeight; // Since Q/F = 1 mol e-
+
+        document.getElementById('equivalent-2').textContent = equivalentWeight.toFixed(3);
+        document.getElementById('mass-2').textContent = mass.toFixed(3);
+
+        // Update visual (scale based on Eq weight, max around Ag+)
+         const maxEqWeight = substances['Ag1'].M / substances['Ag1'].z; // Use Ag+ as reference for max mass
+        updateVisual('deposited-mass-2', null, mass, 'mass', maxEqWeight * 1.1);
+    }
+
+     // Faraday's Third Law Calculation (Combined)
+    function calculateFaraday3() {
+        const selectedSubstanceKey = document.getElementById('substance-select-3').value;
+        const substanceData = substances[selectedSubstanceKey];
+
+        const currentInput = document.getElementById('current-3');
+        const timeInput = document.getElementById('time-3');
+        const currentValueSpan = document.getElementById('current-value-3');
+        const timeValueSpan = document.getElementById('time-value-3');
+
+        const current = parseFloat(currentInput.value);
+        const timeHours = parseFloat(timeInput.value);
+        const timeSeconds = timeHours * 3600;
+
+        currentValueSpan.textContent = current.toFixed(1);
+        timeValueSpan.textContent = timeHours.toFixed(1);
+
+        const charge = current * timeSeconds; // Q = I * t
+        const moles_e = charge / F; // Moles of electrons
+
+        let resultValue = 0;
+        let resultUnit = '';
+        let maxExpectedValue = 1; // Default max for scaling
+
+        if (substanceData.type === 'mass') {
+            const moles_product = moles_e / substanceData.z;
+            resultValue = moles_product * substanceData.M;
+            resultUnit = substanceData.unit;
+            // Estimate max mass for visualization (e.g., for Cu at max I, max t)
+            maxExpectedValue = (substances['Cu2'].M * 20.0 * (5.0 * 3600)) / (substances['Cu2'].z * F);
+
+        } else if (substanceData.type === 'volume') {
+             const moles_product = moles_e / substanceData.z;
+             resultValue = moles_product * MOLAR_VOLUME_STP; // Volume at STP
+             resultUnit = substanceData.unit + ' (TPE)';
+             // Estimate max volume (e.g., for H2 at max I, max t)
+             maxExpectedValue = (MOLAR_VOLUME_STP * (20.0 * (5.0*3600)) / F) / substances['H2'].z;
+        }
+
+        document.getElementById('result-3').textContent = `${resultValue.toFixed(3)} ${resultUnit}`;
+
+        // Update visuals for Law 3
+        updateVisual('deposited-mass-3', 'produced-gas-3', resultValue, substanceData.type, maxExpectedValue * 1.1);
+    }
+
+
+    // --- Initial Calculations & Event Listeners ---
+    window.onload = function() {
+        // Render math formulas if KaTeX is loaded
+         if (typeof renderMathInElement === 'function') {
+             renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "$$", right: "$$", display: true} // Allow $$ for display math
+                ]
+            });
+         }
+
+        // Initialize interactive sections
+        calculateFaraday1();
+        calculateFaraday2();
+        calculateFaraday3();
+
+        // Add event listeners for sliders/selects to update in real-time
+        document.getElementById('current-1')?.addEventListener('input', calculateFaraday1);
+        document.getElementById('time-1')?.addEventListener('input', calculateFaraday1);
+        document.getElementById('ion-select-2')?.addEventListener('change', calculateFaraday2);
+        document.getElementById('substance-select-3')?.addEventListener('change', calculateFaraday3);
+        document.getElementById('current-3')?.addEventListener('input', calculateFaraday3);
+        document.getElementById('time-3')?.addEventListener('input', calculateFaraday3);
+    };
+
+  </script>
+
+</body>
+</html>
