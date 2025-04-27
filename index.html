@@ -298,7 +298,7 @@
         <p class="text-xl mt-8 text-blue-100">Clase Interactiva</p>
         <p class="text-lg mt-2 text-blue-100">Fecha: <span id="current-date"></span></p>
         <div class="nav-button-container">
-            <a href="intro-enigma"class="nav-button">Comenzar <i class="fas fa-arrow-right ml-2"></i></a>
+            <a href="#intro-enigma" class="nav-button">Comenzar <i class="fas fa-arrow-right ml-2"></i></a>
         </div>
     </div>
   </section>
@@ -403,14 +403,17 @@
        </div>
    </section>
 
-   <!-- Slide 4: Faraday's Laws Theory -->
+   <!-- Slide 4: Faraday's Laws Theory (Con imagen de Faraday) -->
    <section id="faraday-laws" class="section">
-       <!-- Contenido sin cambios -->
        <div class="section-content">
             <h2 class="text-4xl font-bold mb-8 text-center">Leyes Cuantitativas: Leyes de Faraday</h2>
             <p class="text-xl text-blue-100 mb-4 text-center">Principios que relacionan la cantidad de sustancia transformada con la cantidad de electricidad.</p>
             <!-- Punto 1 de la definición proporcionada -->
-            <p class="text-lg text-blue-200 mb-12 text-center italic">Según Michael Faraday, la masa de un elemento transformada en una electrólisis es independiente de la composición química del electrolito, siempre que el estado de oxidación del elemento sea el mismo (ej: CuSO₄, Cu(NO₃)₂).</p>
+            <p class="text-lg text-blue-200 mb-8 text-center italic">Según Michael Faraday, la masa de un elemento transformada en una electrólisis es independiente de la composición química del electrolito, siempre que el estado de oxidación del elemento sea el mismo (ej: CuSO₄, Cu(NO₃)₂).</p>
+
+            <!-- AQUÍ SE AÑADE LA IMAGEN DE MICHAEL FARADAY -->
+            <img src="Michael-Faraday.jpg" alt="Retrato de Michael Faraday" class="w-full max-w-xs mx-auto mb-8 border border-blue-400 rounded-lg shadow-lg">
+            <!-- Puedes ajustar max-w-xs (extra pequeño) a max-w-sm (pequeño) o max-w-md (medio) si quieres que sea un poco más grande -->
 
             <div class="comparison-grid">
                  <div class="comparison-item">
@@ -1013,7 +1016,47 @@ Respuesta: 4.334 L H₂ + 2.167 L O₂ = 6.501 L Total</pre></div> </div>
              <!-- Navigation Buttons -->
             <div class="nav-button-container">
                 <a href="#summary" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Otras Aplic.</a>
-                <a href="#thank-you" class="nav-button">Finalizar <i class="fas fa-check-circle ml-2"></i></a>
+                <a href="#project-summary" class="nav-button">Finalizar <i class="fas fa-check-circle ml-2"></i></a>
+            </div>
+        </div>
+    </section>
+<!-- New Slide: Final Project Instructions Summary (AI Use Detailed - Arg) -->
+    <section id="project-summary" class="section">
+        <div class="section-content">
+            <h2 class="text-4xl font-bold mb-8 text-center">Tu Proyecto Final: Simulación de Electrólisis para H₂ Verde</h2>
+            <p class="text-xl text-blue-100 mb-8 text-center">¡Diseñen y construyan su propia herramienta interactiva usando lo aprendido y con la ayuda de IA!</p> <!-- "Diseñen y construyan" -->
+
+            <div class="max-w-4xl mx-auto text-left text-lg">
+                <ul class="list-none pl-0">
+                    <li class="mb-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-blue-300"><i class="fas fa-book mr-3"></i> Paso 1: Fundamentos y Concepto Verde</h3>
+                        <p class="ml-8">Investiguen la química básica de la electrólisis del agua (reacciones, E°, voltaje teórico). Entiendan qué hace que el H₂ sea "verde". <span class="highlight-green">(¡<span class="highlight">Pregunten a la IA</span> por las reacciones, potenciales estándar, cómo calcular el voltaje mínimo (\(E^\circ_{celda}\)), y en qué se diferencia el H₂ verde!)</span></p> <!-- "Investiguen", "Entiendan", "Pregunten" -->
+                    </li>
+                     <li class="mb-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-blue-300"><i class="fas fa-ruler-combined mr-3"></i> Paso 2: Diseñen su Modelo Matemático</h3>
+                        <p class="ml-8">Definan qué Inputs (variables ajustables: I, t, etc.) y Outputs (resultados calculados: masa H₂, vol O₂, energía, etc.) tendrá su simulación. Establezcan las Fórmulas clave (\(m=\frac{MIt}{zF}\), etc.). <span class="highlight-green">(¡<span class="highlight">Pídanle ideas a la IA</span> para inputs/outputs relevantes, que les recuerde las fórmulas de Faraday o les ayude a escribirlas con la sintaxis de su herramienta elegida!)</span></p> <!-- "Definan", "Establezcan", "Pídanle", "les recuerde", "les ayude", "su" -->
+                    </li>
+                     <li class="mb-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-blue-300"><i class="fas fa-cogs mr-3"></i> Paso 3: Construyan su App/Modelo</h3>
+                        <p class="ml-8">Elijan su herramienta (App Builder, Planilla, Código). Creen la Interfaz y Programen/Configuren la Lógica de cálculo (implementen sus fórmulas). Prueben que funcione. <span class="highlight-green">(¡<span class="highlight">Usen la IA</span> para obtener ejemplos de cómo crear elementos en su App Builder/código o para <span class="highlight">ayudarlos a encontrar errores</span> [debugging]!)</span></p> <!-- "Elijan", "Creen", "Programen", "Configuren", "implementen", "Prueben", "Usen", "su", "ayudarlos" -->
+                    </li>
+                     <li class="mb-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-blue-300"><i class="fas fa-chalkboard-teacher mr-3"></i> Paso 4: Analicen y Expliquen su Modelo</h3>
+                        <p class="ml-8">Expliquen la química detrás de su simulación y cómo sus Inputs/Outputs reflejan las Leyes de Faraday y el proceso. (Opcional: Añadan cálculos de eficiencia). <span class="highlight-green">(¡<span class="highlight">Pídanle a la IA que les ayude a redactar</span> explicaciones claras de los principios químicos y la relación entre variables, o a describir la importancia del H₂ verde!)</span></p> <!-- "Expliquen", "Añadan", "Pídanle", "les ayude", "su" -->
+                    </li>
+                     <li class="mb-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-blue-300"><i class="fas fa-presentation mr-3"></i> Paso 5: Presenten su Proyecto</h3>
+                        <p class="ml-8">Muestren su simulación funcionando, expliquen su diseño, los cálculos y lo que aprendieron. Justifiquen sus decisiones. <span class="highlight-green">(¡<span class="highlight">Pregúntenle a la IA</span> cómo estructurar una presentación sobre su proyecto o pídanle ideas para lo que pueden decir en cada parte!)</span></p> <!-- "Muestren", "expliquen", "aprendieron", "Justifiquen", "Pregúntenle", "su", "pídanle" -->
+                    </li>
+                </ul>
+            </div>
+
+             <!-- Navigation Buttons -->
+            <div class="nav-button-container">
+                <!-- Mantén los enlaces según donde hayas decidido ubicar esta diapositiva -->
+                <!-- Por ejemplo, si va después de "Otras Aplicaciones" (#other-applications) -->
+                <a href="#final-summary" class="nav-button"><i class="fas fa-arrow-left mr-2"></i> Antes del Proyecto</a>
+                <a href="#thank-you" class="nav-button">Ir a Resumen Final <i class="fas fa-arrow-right ml-2"></i></a>
             </div>
         </div>
     </section>
@@ -1944,7 +1987,7 @@ Respuesta: 4.334 L H₂ + 2.167 L O₂ = 6.501 L Total</pre></div> </div>
             } else { // Aqueous (conc or dilute)
                  // Enable ActiveCu for aqueous
                  if (activeCuOption) {
-                    activeCuOption.disabled = false;
+                    activeCuOption.disabled = true;
                     activeCuOption.style.display = '';
                 }
                 // Ensure Inert option is available for aqueous
