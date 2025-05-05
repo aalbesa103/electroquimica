@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación: Optimización de CNTs para Separación de Alcanos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script> <!-- Mermaid v10 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <!-- Nota: Chart.js Heatmap no está en CDN estándar, se necesita librería adicional para ese tipo de gráfico -->
+
+    <style>
+        /* --- Base Styles --- */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent body scroll */
+            background: linear-gradient(135deg, #0a2463 0%, #1e3a8a 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        .slide-container { /* Holds all slides */
+             width: 100vw;
+             height: 100vh;
+             overflow: hidden; /* Hide non-active slides */
+        }
+        .slide {
+            width: 1280px; /* Fixed slide width */
+            min-height: 720px; /* Fixed slide height */
+            position: relative;
+            margin: 0 auto; /* Center the slide */
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a2463 0%, #1e3a8a 100%); /* Background for each slide */
+            display: none; /* Hide all slides by default */
+            flex-direction: column; /* Default layout */
+            padding: 2rem; /* Default padding */
+            box-sizing: border-box;
+        }
+        .slide.active-slide {
+            display: flex; /* Show only the active slide */
+        }
+
+        /* --- Common Slide Elements --- */
+        .title-bar {
+            background: rgba(0,30,60,0.7);
+            border-left: 6px solid #10B981;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            width: 100%;
+        }
+        .info-card {
+            background: rgba(0,0,0,0.5);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        .section-footer {
+            margin-top: auto; /* Push footer to bottom */
+            padding-top: 0.5rem;
+            border-top: 1px solid #1e3a8a; /* Use a theme color */
+        }
+        .section-footer p {
+             color: #60A5FA; /* Light blue */
+             font-size: 0.875rem;
+        }
+
+        /* --- Slide 1 Specific Styles --- */
+        .nano-tube { position: absolute; height: 500px; width: 120px; border-radius: 60px; background: linear-gradient(90deg, rgba(0,0,0,0.5) 0%, rgba(16,62,103,0.7) 50%, rgba(0,0,0,0.5) 100%); transform: rotate(-30deg); box-shadow: 0 0 15px rgba(100, 255, 255, 0.4); z-index: 0; }
+        .hexagon { position: absolute; width: 100px; height: 57px; background-color: rgba(15, 118, 110, 0.4); border-radius: 5px; transform: rotate(30deg); z-index: 0; }
+        .hexagon:before, .hexagon:after { content: ""; position: absolute; width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; }
+        .hexagon:before { top: -25px; border-bottom: 25px solid rgba(15, 118, 110, 0.4); }
+        .hexagon:after { bottom: -25px; border-top: 25px solid rgba(15, 118, 110, 0.4); }
+        .industry-icon { position: absolute; font-size: 2.5rem; opacity: 0.7; color: #e2e8f0; animation: float 4s ease-in-out infinite; z-index: 0; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+        .title-section { background: rgba(0, 0, 0, 0.5); border-left: 5px solid #10B981; }
+        .strategic-section { background: rgba(0, 0, 0, 0.4); border-right: 5px solid #10B981; }
+
+        /* --- Slide 2 Specific Styles --- */
+        .product-icon { background: rgba(16,185,129,0.2); border: 2px solid rgba(16,185,129,0.6); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+        .economic-bar { height: 10px; background: linear-gradient(90deg, #10B981 0%, rgba(16,185,129,0.3) 100%); border-radius: 4px; }
+        #slide-2 .mermaid { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; }
+
+        /* --- Slide 3 Specific Styles --- */
+        .distillation-column { height: 250px; width: 70px; background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%); border-radius: 8px; position: relative; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 15px rgba(0,200,255,0.3); }
+        .bubble { position: absolute; background: rgba(255,255,255,0.3); border-radius: 50%; animation: rise 3s infinite ease-in; }
+        .cold-indicator { background: linear-gradient(180deg, #00c3ff 0%, #00b4e6 100%); border-radius: 4px; font-weight: bold; color: #003366; text-align: center; box-shadow: 0 0 10px rgba(0,195,255,0.5); display: inline-block; padding: 4px 8px; }
+        .challenge-item { background: rgba(0,30,60,0.6); border-left: 4px solid #00c3ff; padding: 10px; margin-bottom: 8px; border-radius: 4px; transition: all 0.2s ease; }
+        .challenge-item:hover { transform: translateX(5px); background: rgba(0,40,80,0.8); }
+        @keyframes rise { 0% { opacity: 0; transform: translateY(60px) scale(0.5); } 50% { opacity: 1; transform: translateY(30px) scale(1); } 100% { opacity: 0; transform: translateY(0px) scale(0.7); } }
+
+        /* --- Slide 4 Specific Styles --- */
+        .process-container { position: relative; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .material-item { display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 8px; padding: 8px; transition: all 0.2s ease; }
+        .material-item:hover { background: rgba(255,255,255,0.2); transform: scale(1.02); }
+        .material-icon { width: 40px; height: 40px; background: rgba(16,185,129,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; }
+        .advantage-item { display: flex; padding: 6px; border-left: 3px solid #10B981; background: rgba(0,0,0,0.3); margin-bottom: 6px; transition: all 0.2s ease; }
+        .advantage-item:hover { background: rgba(0,0,0,0.5); transform: translateX(5px); }
+        #slide-4 .mermaid { background: transparent; }
+        #slide-4 .molecule { position: absolute; width: 180px; height: 180px; opacity: 0.15; z-index: 0; }
+        #slide-4 .hexagon { width: 100px; height: 58px; background: rgba(16,185,129,0.2); position: relative; margin: 0 auto; border-radius: 5px; }
+        #slide-4 .hexagon:before, #slide-4 .hexagon:after { content: ''; position: absolute; width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; }
+        #slide-4 .hexagon:before { bottom: 100%; border-bottom: 29px solid rgba(16,185,129,0.2); }
+        #slide-4 .hexagon:after { top: 100%; border-top: 29px solid rgba(16,185,129,0.2); }
+
+        /* --- Slide 5 Specific Styles --- */
+        .nanotube-container { position: relative; perspective: 1000px; height: 250px; }
+        .swcnt { width: 80px; height: 230px; background: linear-gradient(0deg, rgba(0,0,0,0.2), rgba(16,185,129,0.3), rgba(0,0,0,0.2)); border-radius: 40px; position: relative; overflow: hidden; box-shadow: inset 0 0 15px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.3); transform: rotateY(0deg); margin: 0 auto; }
+        .mwcnt { width: 100px; height: 230px; background: linear-gradient(0deg, rgba(0,0,0,0.3), rgba(16,185,129,0.4), rgba(0,0,0,0.3)); border-radius: 50px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.4); margin: 0 auto;}
+        .mwcnt::before { content: ''; position: absolute; width: 70px; height: 230px; top: 0; left: 15px; background: linear-gradient(0deg, rgba(0,0,0,0.5), rgba(16,185,129,0.2), rgba(0,0,0,0.5)); border-radius: 35px; box-shadow: inset 0 0 10px rgba(255,255,255,0.3); }
+        .mwcnt::after { content: ''; position: absolute; width: 40px; height: 230px; top: 0; left: 30px; background: linear-gradient(0deg, rgba(0,0,0,0.6), rgba(16,185,129,0.1), rgba(0,0,0,0.6)); border-radius: 20px; box-shadow: inset 0 0 8px rgba(255,255,255,0.3); }
+        .lattice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: repeating-linear-gradient( 45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 1px, transparent 1px, transparent 8px ); }
+        .property-icon { font-size: 20px; width: 45px; height: 45px; background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
+        .potential-item { padding: 8px 12px; border-radius: 6px; background: rgba(16,185,129,0.15); border-left: 3px solid #10B981; transition: all 0.2s ease; }
+        .potential-item:hover { background: rgba(16,185,129,0.25); transform: translateX(5px); }
+        #slide-5 .carbon-atom { position: absolute; width: 8px; height: 8px; background: rgba(16,185,129,0.8); border-radius: 50%; box-shadow: 0 0 5px rgba(16,185,129,0.5); } /* Renamed */
+
+        /* --- Slide 6 Specific Styles --- */
+        .property-title { background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10B981; }
+        .highlight-text { color: #10B981; font-weight: bold; }
+        .nanotube-small { width: 60px; height: 120px; background: rgba(16, 185, 129, 0.2); border-radius: 30px; position: relative; box-shadow: inset 0 0 8px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
+        .nanotube-medium { width: 80px; height: 120px; background: rgba(16, 185, 129, 0.2); border-radius: 40px; position: relative; box-shadow: inset 0 0 8px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
+        .nanotube-large { width: 100px; height: 120px; background: rgba(16, 185, 129, 0.2); border-radius: 50px; position: relative; box-shadow: inset 0 0 8px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
+        #slide-6 .molecule { width: 12px; height: 12px; background: #10B981; border-radius: 50%; position: absolute; animation: float-s6 5s infinite ease-in-out; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
+        #slide-6 .molecule-small { width: 8px; height: 8px; background: #60A5FA; border-radius: 50%; position: absolute; animation: float-s6 6s infinite ease-in-out; box-shadow: 0 0 4px rgba(96, 165, 250, 0.6); }
+        .selectivity-arrow { position: absolute; width: 60px; height: 2px; background: rgba(16, 185, 129, 0.8); transform-origin: left; animation: grow-s6 3s infinite ease-in-out; }
+        .selectivity-arrow:after { content: ''; position: absolute; right: -6px; top: -3px; width: 0; height: 0; border-left: 6px solid rgba(16, 185, 129, 0.8); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+        .armchair-pattern { background-image: repeating-linear-gradient( 90deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 5px ); }
+        .zigzag-pattern { background-image: repeating-linear-gradient( 45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 5px ), repeating-linear-gradient( -45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 5px ); }
+        .chiral-pattern { background-image: repeating-linear-gradient( 30deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 5px ); }
+        #slide-6 .lattice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        @keyframes float-s6 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes grow-s6 { 0%, 100% { transform: scaleX(0.5); opacity: 0.5; } 50% { transform: scaleX(1); opacity: 1; } }
+
+        /* --- Slide 7 Specific Styles --- */
+        .interaction-title { background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10B981; }
+        #slide-7 .molecule { position: relative; width: 100%; height: 120px; }
+        #slide-7 .atom { position: absolute; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; box-shadow: 0 0 8px rgba(255,255,255,0.2); }
+        .atom-c { background: linear-gradient(45deg, #333 0%, #666 100%); border: 1px solid #999; }
+        #slide-7 .bond { position: absolute; background: rgba(255,255,255,0.7); height: 3px; transform-origin: left center; }
+        .interaction-arrow { position: absolute; width: 30px; height: 10px; border-top: 1px dashed #10B981; animation: pulse-s7 2s infinite; }
+        .interaction-arrow::after { content: ''; position: absolute; right: -1px; top: -5px; width: 0; height: 0; border-left: 6px solid #10B981; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+        .pi-cloud { position: absolute; height: 4px; background: linear-gradient(90deg, rgba(120,81,169,0) 0%, rgba(120,81,169,0.7) 50%, rgba(120,81,169,0) 100%); border-radius: 50%; filter: blur(1px); }
+        .functionalization-group { position: absolute; padding: 3px 5px; border-radius: 4px; font-size: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 6px rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s ease; z-index: 10; }
+        .functionalization-group:hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .oh-group { background: linear-gradient(45deg, #3B82F6 0%, #1D4ED8 100%); border: 1px solid #60A5FA; }
+        .cooh-group { background: linear-gradient(45deg, #EF4444 0%, #B91C1C 100%); border: 1px solid #F87171; }
+        .nh2-group { background: linear-gradient(45deg, #8B5CF6 0%, #6D28D9 100%); border: 1px solid #A78BFA; }
+        .nanotube-horizontal { width: 180px; height: 30px; background: rgba(16, 185, 129, 0.2); border-radius: 15px; position: relative; box-shadow: inset 0 0 8px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.2); overflow: hidden; margin: 0 auto; }
+        #slide-7 .lattice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: repeating-linear-gradient( 90deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 5px ); }
+        .curved-arrow { position: absolute; width: 30px; height: 30px; border: 1px dashed #10B981; border-top: none; border-right: none; border-radius: 0 0 0 30px; transform: rotate(45deg); }
+        @keyframes pulse-s7 { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* --- Slide 8 Specific Styles --- */
+        #slide-8 .method-card { border-radius: 8px; overflow: hidden; transition: all 0.3s ease; margin-bottom: 0.75rem; }
+        #slide-8 .method-card:hover { transform: translateY(-3px); box-shadow: 0 8px 12px rgba(0,0,0,0.3); } /* Adjusted hover effect */
+        #slide-8 .method-header { background: rgba(16, 185, 129, 0.8); padding: 6px; text-align: center; font-weight: bold; font-size: 0.9em; }
+        #slide-8 .method-body { background: rgba(0,0,0,0.6); padding: 8px; }
+        #slide-8 .method-body ul { padding-left: 5px; } /* Added padding */
+        #slide-8 .method-footer { background: rgba(16, 185, 129, 0.2); padding: 4px; text-align: center; font-size: 0.75em; }
+        #slide-8 .highlight-box { background: rgba(60, 60, 150, 0.4); border: 1px solid rgba(60, 60, 150, 0.8); border-radius: 6px; padding: 8px; margin-top: 1rem;} /* Adjusted padding/border */
+        #slide-8 .challenge-item { background: rgba(255,255,255,0.1); border-radius: 6px; margin-bottom: 5px; padding: 6px; display: flex; align-items: center; transition: all 0.2s ease; }
+        #slide-8 .challenge-item:hover { background: rgba(255,255,255,0.2); transform: translateX(3px); }
+        #slide-8 .challenge-icon { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.6); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0; }
+        #slide-8 .mermaid { background: rgba(0,0,0,0.2); border-radius: 6px; padding: 6px; }
+        #slide-8 .radar-container { position: relative; height: 160px; width: 100%; } /* Adjusted height */
+        #slide-8 .furnace { position: relative; width: 120px; height: 60px; background: linear-gradient(to right, #B91C1C, #F87171, #B91C1C); border-radius: 4px; margin: 0 auto; overflow: hidden; box-shadow: 0 0 8px rgba(239, 68, 68, 0.7); }
+        #slide-8 .furnace-inner { position: absolute; top: 8px; left: 12px; width: 96px; height: 44px; background: linear-gradient(to right, #F87171, #FECACA, #F87171); border-radius: 2px; }
+        #slide-8 .tube { position: absolute; top: 20px; left: -15px; width: 150px; height: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; }
+        #slide-8 .cat-particle { position: absolute; width: 3px; height: 3px; background: #60A5FA; border-radius: 50%; }
+        #slide-8 .carbon-particle { position: absolute; width: 2px; height: 2px; background: #111827; border-radius: 50%; animation: float-s8 3s infinite linear; }
+        @keyframes float-s8 { 0% { transform: translateY(0px) translateX(0px); } 25% { transform: translateY(-2px) translateX(1px); } 50% { transform: translateY(0px) translateX(2px); } 75% { transform: translateY(2px) translateX(1px); } 100% { transform: translateY(0px) translateX(0px); } }
+
+        /* --- Slide 9 Specific Styles --- */
+        #slide-9 .section-title { font-size: 2.0rem; font-weight: bold; color: #10B981; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        #slide-9 .highlight-box { background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981; border-radius: 0 8px 8px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #slide-9 .advantage-card { background: rgba(0,0,0,0.4); border-radius: 8px; transition: all 0.3s ease; overflow: hidden; height: 170px; display: flex; flex-direction: column;} /* Adjusted height & layout */
+        #slide-9 .advantage-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        #slide-9 .advantage-header { background: rgba(16, 185, 129, 0.3); border-bottom: 1px solid rgba(16, 185, 129, 0.5); padding-top: 25px; /* Space for icon */ }
+        #slide-9 .advantage-icon { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #10B981 0%, #059669 100%); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); }
+        #slide-9 .molecule { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,0.5) 0%, rgba(16,185,129,0) 70%); opacity: 0.3; z-index: 0; filter: blur(2px); }
+        #slide-9 .carbon-atom { position: absolute; width: 6px; height: 6px; background: #10B981; border-radius: 50%; box-shadow: 0 0 8px rgba(16,185,129,0.7); }
+        #slide-9 .bond { position: absolute; height: 1px; background: rgba(16,185,129,0.7); transform-origin: left center; }
+        #slide-9 .mermaid { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 8px; height: auto;} /* Adjusted padding */
+        @keyframes pulse-s9 { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.03); opacity: 1; } }
+        #slide-9 .pulse-animation { animation: pulse-s9 3s infinite ease-in-out; }
+
+        /* --- Slide 10 Specific Styles --- */
+        #slide-10 .method-card { background: rgba(0,0,0,0.5); border-radius: 6px; overflow: hidden; transition: all 0.3s ease; }
+        #slide-10 .method-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+        #slide-10 .method-icon { background: linear-gradient(135deg, rgba(16, 185, 129, 0.8) 0%, rgba(5, 150, 105, 0.8) 100%); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
+        #slide-10 .parameter-item { background: rgba(255,255,255,0.1); border-left: 2px solid #10B981; transition: all 0.2s ease; cursor: default; padding: 6px 10px; border-radius: 4px; }
+        #slide-10 .parameter-item:hover { background: rgba(255,255,255,0.15); transform: translateX(3px); }
+        #slide-10 .mermaid { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 10px; box-shadow: inset 0 0 6px rgba(0,0,0,0.2); height: auto; }
+        #slide-10 .pulse-animation { animation: pulse-s10 2s infinite; }
+        @keyframes pulse-s10 { 0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        #slide-10 .grid-background { background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 12px 12px; }
+        #slide-10 .parameter-icon { width: 30px; height: 30px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+        /* --- Slide 11 Specific Styles --- */
+        #slide-11 .result-card { background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; }
+        #slide-11 .result-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
+        #slide-11 .result-header { background: linear-gradient(90deg, rgba(16, 185, 129, 0.8) 0%, rgba(5, 150, 105, 0.4) 100%); padding: 6px 10px; border-bottom: 1px solid rgba(16, 185, 129, 0.6); }
+        #slide-11 .result-icon { background: rgba(0,0,0,0.3); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); }
+        #slide-11 .model-visual, #slide-11 .heatmap-container, #slide-11 .candidate-container, #slide-11 .collab-container { position: relative; height: 140px; /* Adjusted height */ background: rgba(0,0,0,0.2); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem; }
+        #slide-11 .nanotube { width: 40px; height: 90px; background: linear-gradient(180deg, rgba(16,185,129,0.2) 0%, rgba(16,185,129,0.4) 50%, rgba(16,185,129,0.2) 100%); border-radius: 20px; position: relative; box-shadow: 0 0 8px rgba(16,185,129,0.3); border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
+        #slide-11 .func-group { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: rgba(239,68,68,0.8); box-shadow: 0 0 2px rgba(239,68,68,0.5); }
+        #slide-11 .node { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 0 6px rgba(0,0,0,0.3); position: absolute; }
+        #slide-11 .connection { position: absolute; height: 1px; background: rgba(255,255,255,0.5); transform-origin: left; z-index: 1; }
+        #slide-11 .prediction-line { position: absolute; background: rgba(16,185,129,0.8); height: 1px; z-index: 10; }
+        #slide-11 .data-point { position: absolute; width: 5px; height: 5px; border-radius: 50%; z-index: 20; }
+        #slide-11 .grid-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 12px 12px; z-index: 1; }
+        #slide-11 .highlight-pulse { animation: pulse-s11 2s infinite; }
+        #slide-11 .rotate-slow { animation: rotate-s11 10s linear infinite; }
+        @keyframes pulse-s11 { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
+        @keyframes rotate-s11 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        #slide-11 .heatmap-container { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1px; padding: 3px; }
+        #slide-11 .heatmap-cell { border-radius: 1px; }
+
+        /* --- Slide 12 Specific Styles --- */
+        #slide-12 .impact-card { background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; }
+        #slide-12 .impact-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
+        #slide-12 .impact-header { padding: 12px; display: flex; align-items: center; }
+        #slide-12 .impact-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); }
+        #slide-12 .benefit-item { display: flex; align-items: flex-start; margin-bottom: 8px; padding: 6px; border-radius: 4px; transition: all 0.2s ease; }
+        #slide-12 .benefit-item:hover { background: rgba(255,255,255,0.08); }
+        #slide-12 .benefit-icon { background: rgba(255,255,255,0.1); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0; }
+        #slide-12 .brand-container { position: absolute; bottom: 12px; right: 12px; display: flex; align-items: center; background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 6px; }
+        #slide-12 .brand-logo { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        #slide-12 .ypf-logo { background: rgba(20, 83, 153, 0.9); color: white; font-weight: bold; font-size: 12px; }
+        #slide-12 .ytec-logo { background: white; color: rgba(20, 83, 153, 0.9); font-weight: bold; font-size: 10px; }
+        #slide-12 .value-gauge { position: relative; width: 60px; height: 30px; margin: 0 auto; background: linear-gradient(0deg, rgba(255,0,0,0.3) 0%, rgba(255,255,0,0.3) 50%, rgba(0,255,0,0.3) 100%); border-radius: 60px 60px 0 0; overflow: hidden; }
+        #slide-12 .gauge-needle { position: absolute; bottom: 0; left: 30px; width: 1px; height: 27px; background: white; transform-origin: bottom center; transform: rotate(60deg); box-shadow: 0 0 6px rgba(255,255,255,0.8); }
+
+        /* --- Slide 13 Specific Styles --- */
+        #slide-13 .conclusion-container { background: rgba(0,0,0,0.4); border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); overflow: hidden; height: 100%; }
+        #slide-13 .conclusion-item { position: relative; padding: 12px; padding-left: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        #slide-13 .conclusion-item:hover { background: rgba(255,255,255,0.05); transform: translateX(6px); }
+        #slide-13 .conclusion-item:last-child { border-bottom: none; }
+        #slide-13 .conclusion-number { position: absolute; left: -10px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; background: #10B981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+        #slide-13 .conclusion-icon { width: 40px; height: 40px; background: rgba(16,185,129,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 8px rgba(16,185,129,0.3); border: 1px solid rgba(16,185,129,0.4); margin-right: 12px; flex-shrink: 0; }
+        #slide-13 .path-arrow { position: absolute; height: 1px; background: rgba(16,185,129,0.7); z-index: 10; transform-origin: left; }
+        #slide-13 .path-arrow:after { content: ''; position: absolute; right: -5px; top: -3px; width: 0; height: 0; border-left: 6px solid rgba(16,185,129,0.7); border-top: 3px solid transparent; border-bottom: 3px solid transparent; }
+        #slide-13 .final-card { background: linear-gradient(135deg, rgba(16,185,129,0.3) 0%, rgba(5,150,105,0.1) 100%); border: 1px solid rgba(16,185,129,0.5); border-radius: 10px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+        #slide-13 .shine { position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient( 90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100% ); animation: shine-s13 3s infinite; }
+        @keyframes shine-s13 { 0% { left: -100%; } 100% { left: 200%; } }
+        #slide-13 .conclusion-badge { position: absolute; top: -8px; right: -8px; width: 50px; height: 50px; background: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; transform: rotate(15deg); box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid white; }
+        #slide-13 .mermaid { margin-top: 1rem; }
+
+         /* --- Slide 14 Specific Styles --- */
+        #slide-14 .questions-text { font-size: 3.5rem; font-weight: bold; background: linear-gradient(90deg, #10B981, #3B82F6, #10B981); background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text; animation: shine-s14 4s linear infinite; text-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+        @keyframes shine-s14 { to { background-position: 200% center; } }
+        #slide-14 .contact-card { background: rgba(0,0,0,0.4); border-radius: 10px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(6px); width: 100%; max-width: 400px; }
+        #slide-14 .card-header { background: linear-gradient(90deg, rgba(16, 185, 129, 0.8) 0%, rgba(59, 130, 246, 0.8) 100%); padding: 10px; text-align: center; }
+        #slide-14 .card-body { padding: 15px; }
+        #slide-14 .contact-item { display: flex; align-items: center; margin-bottom: 10px; padding: 6px; border-radius: 6px; transition: all 0.2s ease; }
+        #slide-14 .contact-item:hover { background: rgba(255,255,255,0.1); transform: translateX(4px); }
+        #slide-14 .contact-icon { width: 30px; height: 30px; background: rgba(16, 185, 129, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; }
+        #slide-14 .brand-logo { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 6px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        #slide-14 .ypf-logo { background: rgba(20, 83, 153, 0.9); color: white; font-weight: bold; font-size: 14px; }
+        #slide-14 .ytec-logo { background: white; color: rgba(20, 83, 153, 0.9); font-weight: bold; font-size: 12px; }
+        #slide-14 .nanotube { position: absolute; background: linear-gradient(0deg, rgba(16,185,129,0.05), rgba(16,185,129,0.15), rgba(16,185,129,0.05)); border-radius: 50px; z-index: 0; overflow: hidden; box-shadow: inset 0 0 15px rgba(16,185,129,0.1); border: 1px solid rgba(255,255,255,0.05); }
+        #slide-14 .lattice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: repeating-linear-gradient( 45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 8px ); }
+        #slide-14 .thanks-highlight { display: inline-block; padding: 3px 10px; background: linear-gradient(90deg, rgba(16, 185, 129, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%); border-radius: 15px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); animation: pulse-s14 2s infinite ease-in-out; }
+        @keyframes pulse-s14 { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        #slide-14 .social-icon { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.1); margin: 0 3px; transition: all 0.2s ease; }
+        #slide-14 .social-icon:hover { transform: translateY(-2px); background: rgba(16, 185, 129, 0.5); }
+
+        /* --- Navigation Styles --- */
+        #navigation { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(0, 0, 0, 0.6); padding: 6px; border-radius: 8px; display: flex; gap: 5px; }
+        #navigation button { background-color: #10B981; color: white; font-weight: bold; padding: 6px 12px; font-size: 0.9em; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease; }
+        #navigation button:hover:not(:disabled) { background-color: #059669; }
+        #navigation button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.6; }
+        #slideCounter { color: white; background-color: rgba(0,0,0,0.7); padding: 6px 10px; border-radius: 4px; font-size: 0.8em; }
+
+    </style>
+</head>
+<body>
+
+<div class="slide-container">
+
+    <!-- Slide 1: Título -->
+    <div id="slide-1" class="slide flex flex-col justify-between active-slide">
+        <!-- Background elements -->
+        <div class="nano-tube" style="top: 140px; left: 220px; transform: rotate(-30deg)"></div>
+        <div class="nano-tube" style="top: 240px; left: 600px; transform: rotate(15deg); width: 80px;"></div>
+        <div class="hexagon" style="top: 160px; left: 340px;"></div>
+        <div class="hexagon" style="top: 280px; left: 500px;"></div>
+        <div class="hexagon" style="top: 290px; left: 230px;"></div>
+
+        <!-- Industry elements -->
+        <div class="industry-icon" style="position: absolute; top: 160px; right: 180px;"> <i class="fas fa-industry"></i> </div>
+        <div class="industry-icon" style="position: absolute; top: 260px; right: 300px;"> <i class="fas fa-flask"></i> </div>
+        <div class="industry-icon" style="position: absolute; top: 340px; right: 220px;"> <i class="fas fa-oil-well"></i> </div>
+
+        <!-- Content -->
+        <header class="pt-8 px-16 z-10">
+            <div class="title-section p-6 rounded-tr-lg">
+                <h1 class="text-4xl font-bold text-white mb-1">Optimización de Nanotubos de Carbono</h1>
+                <h2 class="text-2xl font-semibold text-green-400 mb-4">para la Separación Eficiente de Alcanos mediante Simulación Molecular</h2>
+                <div class="flex items-center">
+                    <div class="bg-blue-900 py-1 px-3 rounded-md inline-block">
+                        <p class="text-lg">[Tu Nombre / Equipo Y-TEC]</p> <!-- Placeholder -->
+                    </div>
+                    <div class="ml-4 py-1 px-3">
+                         <!-- Asegúrate de tener ytec_logo.png o cambia/elimina la etiqueta img -->
+                        <img src="ytec_logo.png" alt="Y-TEC Logo" class="h-10" onerror="this.style.display='none'; this.parentElement.innerHTML='Y-TEC'; this.parentElement.classList.add('font-bold', 'text-xl');">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow flex flex-col justify-center z-10 px-16">
+            <!-- Empty main to show visuals -->
+        </main>
+
+        <footer class="pb-8 px-16 z-10">
+            <div class="strategic-section p-5 ml-auto w-3/4 rounded-tl-lg">
+                <h3 class="text-xl font-semibold text-green-400 mb-1">Línea Estratégica:</h3>
+                <p class="text-lg mb-3">"Aplicaciones industriales de nanomateriales de carbono"</p>
+                <div class="flex items-center mt-3">
+                    <div class="mr-4"> <i class="fas fa-lightbulb text-yellow-400 text-2xl"></i> </div>
+                    <div>
+                        <h4 class="text-lg font-medium text-blue-300">Importancia Estratégica:</h4>
+                        <p class="text-base">Eficiencia energética e innovación tecnológica para el futuro de YPF/Y-TEC</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Slide 2: Importancia Crítica -->
+    <div id="slide-2" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">La Importancia Crítica de la Separación de Alcanos</h1> </div>
+        <div class="flex flex-1 mt-4">
+            <div class="w-1/2 pr-4 flex flex-col">
+                <div class="info-card p-4 mb-4 flex-1">
+                    <h2 class="text-xl font-bold text-green-400 mb-2"> <i class="fas fa-industry mr-2"></i> Relevancia Industrial </h2>
+                    <p class="mb-2"><span class="font-semibold text-blue-200">Pilar fundamental:</span> Separación de alcanos/alquenos</p>
+                    <p class="mb-2"><span class="font-semibold text-blue-200">Sectores clave:</span> Petroquímica y refino</p>
+                    <p class="mb-2"><span class="font-semibold text-blue-200">Desafío técnico:</span> Similitud molecular extrema</p>
+                </div>
+                <div class="info-card p-4 flex-1">
+                    <h2 class="text-xl font-bold text-green-400 mb-3"> <i class="fas fa-chart-line mr-2"></i> Impacto Económico </h2>
+                    <div class="mb-2"> <div class="flex justify-between mb-1 text-sm"><span>Calidad del Producto</span><span>Alto</span></div> <div class="economic-bar w-4/5"></div> </div>
+                    <div class="mb-2"> <div class="flex justify-between mb-1 text-sm"><span>Rentabilidad</span><span>Directa</span></div> <div class="economic-bar w-3/5"></div> </div>
+                    <div> <div class="flex justify-between mb-1 text-sm"><span>Eficiencia Energética</span><span>Crítica</span></div> <div class="economic-bar w-full"></div> </div>
+                </div>
+            </div>
+            <div class="w-1/2 pl-4 flex flex-col">
+                <div class="mb-4 flex-1">
+                    <div class="mermaid w-full h-full" id="flowchart-s2">
+                        <pre class="mermaid">
+graph TD
+    A[Crudo/Gas Natural] --> B(Refinería/Planta)
+    B --> C{Separación<br>Alcanos/Alquenos}
+    C -- Punto crítico --> D[Productos Finales]
+    style C fill:#10B981,stroke:#0D8A6F,color:white
+                        </pre>
+                    </div>
+                </div>
+                <div class="info-card p-4 flex-1">
+                    <h2 class="text-xl font-bold text-green-400 mb-3"> <i class="fas fa-flask mr-2"></i> Productos Clave </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex items-center"> <div class="product-icon mr-2"><i class="fas fa-shopping-bag text-green-400 text-lg"></i></div> <div> <h3 class="font-semibold text-sm">Etileno/Etano</h3> <p class="text-xs text-gray-300">Plásticos</p> </div> </div>
+                        <div class="flex items-center"> <div class="product-icon mr-2"><i class="fas fa-vial text-green-400 text-lg"></i></div> <div> <h3 class="font-semibold text-sm">Propileno/Propano</h3> <p class="text-xs text-gray-300">Polímeros</p> </div> </div>
+                        <div class="flex items-center"> <div class="product-icon mr-2"><i class="fas fa-car text-green-400 text-lg"></i></div> <div> <h3 class="font-semibold text-sm">Isómeros C4</h3> <p class="text-xs text-gray-300">Caucho</p> </div> </div>
+                        <div class="flex items-center"> <div class="product-icon mr-2"><i class="fas fa-gas-pump text-green-400 text-lg"></i></div> <div> <h3 class="font-semibold text-sm">Isómeros C5/C6</h3> <p class="text-xs text-gray-300">Gasolinas</p> </div> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 1: EL CONTEXTO INDUSTRIAL Y EL DESAFÍO ENERGÉTICO</p> </div>
+    </div>
+
+    <!-- Slide 3: Problema Destilación -->
+    <div id="slide-3" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">El Problema: La Destilación Criogénica y su Costo Energético</h1> </div>
+         <div class="flex flex-1 mt-4 gap-4">
+             <div class="w-1/4 flex flex-col items-center justify-center relative">
+                 <div class="distillation-column mb-4">
+                     <div class="bubble" style="width: 12px; height: 12px; left: 10px; animation-delay: 0.5s;"></div> <div class="bubble" style="width: 10px; height: 10px; left: 30px; animation-delay: 1.2s;"></div> <div class="bubble" style="width: 15px; height: 15px; left: 45px; animation-delay: 0s;"></div> <div class="bubble" style="width: 8px; height: 8px; left: 15px; animation-delay: 1.8s;"></div> <div class="bubble" style="width: 11px; height: 11px; left: 38px; animation-delay: 2.4s;"></div>
+                 </div>
+                 <div class="text-center"> <h2 class="text-xl font-bold text-blue-300 mb-1">Destilación Criogénica</h2> <p class="text-base mb-1">Tecnología Dominante</p> <div class="cold-indicator text-sm"> <i class="fas fa-snowflake mr-1"></i> Hasta -160°C </div> </div>
+                 <div class="text-center mt-4 info-card p-3 w-full"> <h3 class="text-base font-semibold mb-1">Principio Básico</h3> <p class="text-xs">Separación por puntos de ebullición</p> </div>
+             </div>
+             <div class="w-1/3 px-2 flex flex-col items-center">
+                 <div class="mb-4 info-card p-3 w-full"> <h3 class="text-lg font-semibold mb-2 text-center">Puntos de Ebullición Cercanos</h3> <canvas id="boilingPointChart" height="180"></canvas> </div>
+                 <div class="mt-2 info-card p-3 w-full"> <h3 class="text-lg font-semibold mb-1 text-yellow-300 text-center"><i class="fas fa-exclamation-triangle mr-1"></i> Consumo Energético</h3> <div class="flex items-center justify-center"> <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-base mr-2"> 0.3% </div> <div class="text-xs"> del consumo <br>energético global (E/E)</div> </div> <p class="text-center text-xs mt-1">Equivalente al consumo de Singapur (P/P)</p> </div>
+             </div>
+             <div class="w-5/12 pl-2">
+                 <h3 class="text-lg font-semibold mb-2 text-red-300"><i class="fas fa-exclamation-circle mr-1"></i> Desafíos Fundamentales</h3>
+                 <div class="space-y-2">
+                     <div class="challenge-item"> <div class="flex items-center"> <i class="fas fa-bolt text-yellow-400 text-lg mr-2 w-6 text-center"></i> <div> <h4 class="font-semibold text-sm">Alto Consumo Energético</h4> <p class="text-xs text-gray-300">Refrigeración y alta presión</p> </div> </div> </div>
+                     <div class="challenge-item"> <div class="flex items-center"> <i class="fas fa-thermometer-half text-blue-300 text-lg mr-2 w-6 text-center"></i> <div> <h4 class="font-semibold text-sm">Ineficiencia Mezclas Cercanas</h4> <p class="text-xs text-gray-300">Columnas enormes</p> </div> </div> </div>
+                     <div class="challenge-item"> <div class="flex items-center"> <i class="fas fa-project-diagram text-purple-300 text-lg mr-2 w-6 text-center"></i> <div> <h4 class="font-semibold text-sm">Ineficacia con Isómeros</h4> <p class="text-xs text-gray-300">Separación casi imposible</p> </div> </div> </div>
+                     <div class="challenge-item"> <div class="flex items-center"> <i class="fas fa-coins text-yellow-300 text-lg mr-2 w-6 text-center"></i> <div> <h4 class="font-semibold text-sm">Altos Costos (CAPEX/OPEX)</h4> <p class="text-xs text-gray-300">Inversión y operación</p> </div> </div> </div>
+                     <div class="challenge-item"> <div class="flex items-center"> <i class="fas fa-leaf text-green-400 text-lg mr-2 w-6 text-center"></i> <div> <h4 class="font-semibold text-sm">Huella de Carbono</h4> <p class="text-xs text-gray-300">Altas emisiones CO₂</p> </div> </div> </div>
+                 </div>
+             </div>
+         </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 1: EL CONTEXTO INDUSTRIAL Y EL DESAFÍO ENERGÉTICO</p> </div>
+    </div>
+
+    <!-- Slide 4: Alternativa Adsorción -->
+    <div id="slide-4" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">La Alternativa Emergente: Separación por Adsorción</h1> </div>
+        <div class="molecule" style="top: 100px; right: 50px; z-index: 0;"> <div class="hexagon"></div> </div>
+        <div class="molecule" style="bottom: 150px; left: 100px; z-index: 0;"> <div class="hexagon"></div> </div>
+        <div class="flex flex-1 mt-4 gap-4">
+            <div class="w-1/3 pr-2 z-10">
+                <div class="info-card p-4 mb-4">
+                    <h2 class="text-lg font-bold text-green-400 mb-2"><i class="fas fa-atom mr-2"></i> Principio Fundamental</h2>
+                    <div class="bg-blue-900 bg-opacity-50 p-2 rounded-md mb-2"><p class="font-medium text-sm">Adhesión selectiva a superficie porosa</p></div>
+                    <div class="flex justify-around text-center text-xs"> <div><i class="fas fa-magnet text-lg text-blue-300"></i><p>Afinidad</p></div> <div><i class="fas fa-filter text-lg text-blue-300"></i><p>Selectividad</p></div> <div><i class="fas fa-recycle text-lg text-blue-300"></i><p>Regeneración</p></div> </div>
+                </div>
+                <div class="info-card p-4">
+                    <h2 class="text-lg font-bold text-green-400 mb-2"><i class="fas fa-cogs mr-2"></i> Mecanismos</h2>
+                    <div class="mb-1 flex items-center text-sm"><div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div><span class="font-semibold">Equilibrio</span><span class="ml-2 text-xs text-gray-300">- afinidad</span></div>
+                    <div class="mb-1 flex items-center text-sm"><div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div><span class="font-semibold">Cinética</span><span class="ml-2 text-xs text-gray-300">- velocidad</span></div>
+                    <div class="flex items-center text-sm"><div class="w-2 h-2 bg-purple-400 rounded-full mr-2"></div><span class="font-semibold">Tamizado</span><span class="ml-2 text-xs text-gray-300">- tamaño/forma</span></div>
+                </div>
+            </div>
+            <div class="w-1/3 px-2 z-10">
+                <div class="process-container p-3 h-full">
+                    <h2 class="text-lg font-bold text-green-400 mb-2 text-center"><i class="fas fa-sync-alt mr-2"></i> Procesos Comunes</h2>
+                    <div class="mermaid h-36 mb-2" id="processFlow-s4">
+                        <pre class="mermaid">
+graph TD
+    A[Mezcla] --> B{Tipo}
+    B -- Presión --> C[PSA]
+    B -- Vacío --> D[VSA]
+    B -- Temp. --> E[TSA]
+    C & D & E --> F[Producto]
+    subgraph Swing
+        C
+        D
+        E
+    end
+    style B fill:#10B981,stroke:#0D8A6F,color:white
+    style C fill:#3B82F6,stroke:#1D4ED8
+    style D fill:#6366F1,stroke:#4338CA
+    style E fill:#8B5CF6,stroke:#6D28D9
+                        </pre>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 text-center"> <div class="bg-blue-600 bg-opacity-50 p-1 rounded-md"><h3 class="font-semibold text-sm">PSA</h3><p class="text-xs">Pressure</p></div> <div class="bg-indigo-600 bg-opacity-50 p-1 rounded-md"><h3 class="font-semibold text-sm">VSA</h3><p class="text-xs">Vacuum</p></div> <div class="bg-purple-600 bg-opacity-50 p-1 rounded-md"><h3 class="font-semibold text-sm">TSA</h3><p class="text-xs">Temperature</p></div> </div>
+                </div>
+            </div>
+            <div class="w-1/3 pl-2 z-10">
+                <div class="info-card p-4 mb-4">
+                    <h2 class="text-lg font-bold text-green-400 mb-2"><i class="fas fa-flask mr-2"></i> Materiales Típicos</h2>
+                    <div class="material-item"> <div class="material-icon"><i class="fas fa-cubes text-green-400 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Zeolitas</h3><p class="text-xs text-gray-300">Cristalinos</p></div> </div>
+                    <div class="material-item"> <div class="material-icon"><i class="fas fa-network-wired text-green-400 text-sm"></i></div> <div><h3 class="font-semibold text-sm">MOFs</h3><p class="text-xs text-gray-300">Muy porosos</p></div> </div>
+                    <div class="material-item"> <div class="material-icon"><i class="fas fa-cloud text-green-400 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Carbones Activados</h3><p class="text-xs text-gray-300">Versátiles</p></div> </div>
+                </div>
+                <div class="info-card p-4">
+                    <h2 class="text-lg font-bold text-green-400 mb-2"><i class="fas fa-chart-line mr-2"></i> Tecno-Economía</h2>
+                    <ul class="list-disc list-inside text-xs"> <li class="mb-1">Etileno post-OCM: Menor costo</li> <li class="mb-1">Fraccionamiento NGLs: Viable</li> <li class="mb-1">Híbridos: Prometedores</li> </ul>
+                    <div class="mt-1 bg-green-900 bg-opacity-30 p-1 rounded-md text-center"><span class="font-semibold text-xs">Resultado:</span> Potencialmente más económico</div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 mb-2 z-10">
+            <h3 class="text-base font-semibold text-green-300 mb-1">Ventajas Potenciales vs Destilación</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <div class="advantage-item text-xs"><i class="fas fa-bolt text-yellow-400 mr-2 mt-1"></i><p>Menor energía</p></div>
+                <div class="advantage-item text-xs"><i class="fas fa-temperature-low text-blue-300 mr-2 mt-1"></i><p>T° ambiente</p></div>
+                <div class="advantage-item text-xs"><i class="fas fa-leaf text-green-400 mr-2 mt-1"></i><p>Menor huella CO₂</p></div>
+                <div class="advantage-item text-xs"><i class="fas fa-dollar-sign text-yellow-300 mr-2 mt-1"></i><p>Menor OPEX</p></div>
+            </div>
+        </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 1: EL CONTEXTO INDUSTRIAL Y EL DESAFÍO ENERGÉTICO</p> </div>
+    </div>
+
+    <!-- Slide 5: Introducción CNTs -->
+    <div id="slide-5" class="slide">
+         <div class="title-bar"> <h1 class="text-3xl font-bold">Introducción a los Nanotubos de Carbono (CNTs)</h1> </div>
+         <div class="flex flex-1 mt-4 gap-6">
+             <div class="w-1/3 flex flex-col items-center justify-center">
+                 <div class="text-center mb-3">
+                     <div class="inline-block bg-green-900 bg-opacity-50 px-3 py-1 rounded-full mb-2"> <h2 class="text-xl font-bold text-green-400">¿Qué son?</h2> </div>
+                     <p class="text-base">Estructuras cilíndricas 1D de carbono</p>
+                     <p class="text-xs text-gray-300">(Láminas de grafeno enrolladas)</p>
+                 </div>
+                 <div class="relative w-full h-16 mb-3">
+                     <div class="carbon-atom" style="top: 10px; left: 20%;"></div> <div class="carbon-atom" style="top: 40px; left: 65%;"></div> <div class="carbon-atom" style="top: 55px; left: 35%;"></div> <div class="carbon-atom" style="top: 15px; left: 80%;"></div> <div class="carbon-atom" style="top: 60px; left: 75%;"></div>
+                 </div>
+                 <div class="flex justify-around w-full">
+                     <div> <div class="nanotube-container"> <div class="swcnt"><div class="lattice"></div></div> </div> <div class="text-center mt-1"> <h3 class="font-bold text-blue-300 text-sm">SWCNT</h3> <p class="text-xs text-gray-300">Pared simple</p> </div> </div>
+                     <div> <div class="nanotube-container"> <div class="mwcnt"><div class="lattice"></div></div> </div> <div class="text-center mt-1"> <h3 class="font-bold text-blue-300 text-sm">MWCNT</h3> <p class="text-xs text-gray-300">Multicapa</p> </div> </div>
+                 </div>
+             </div>
+             <div class="w-2/3 pl-4">
+                 <div class="info-card p-4 mb-4">
+                     <h2 class="text-xl font-bold text-green-400 mb-3"><i class="fas fa-star mr-2"></i> Propiedades Excepcionales</h2>
+                     <div class="grid grid-cols-2 gap-4">
+                         <div class="flex items-center"> <div class="property-icon"><i class="fas fa-hammer text-green-400 text-base"></i></div> <div> <h3 class="font-bold text-sm">Mecánicas</h3> <p class="text-xs">Alta resistencia</p> </div> </div>
+                         <div class="flex items-center"> <div class="property-icon"><i class="fas fa-bolt text-green-400 text-base"></i></div> <div> <h3 class="font-bold text-sm">Eléctricas</h3> <p class="text-xs">Alta conductividad</p> </div> </div>
+                         <div class="flex items-center"> <div class="property-icon"><i class="fas fa-fire text-green-400 text-base"></i></div> <div> <h3 class="font-bold text-sm">Térmicas</h3> <p class="text-xs">Alta conductividad</p> </div> </div>
+                         <div class="flex items-center"> <div class="property-icon"><i class="fas fa-expand-arrows-alt text-green-400 text-base"></i></div> <div> <h3 class="font-bold text-sm">Área Superficial</h3> <p class="text-xs">Muy elevada</p> </div> </div>
+                     </div>
+                 </div>
+                 <div class="info-card p-4">
+                     <h2 class="text-xl font-bold text-green-400 mb-3"><i class="fas fa-flask mr-2"></i> Potencial en Separación</h2>
+                     <div class="grid grid-cols-2 gap-3">
+                         <div class="potential-item text-sm"><h3 class="font-bold text-xs mb-1">Área Superficial</h3><p>Alta capacidad</p></div>
+                         <div class="potential-item text-sm"><h3 class="font-bold text-xs mb-1">Porosidad Sintonizable</h3><p>Ajuste fino</p></div>
+                         <div class="potential-item text-sm"><h3 class="font-bold text-xs mb-1">Transporte Rápido</h3><p>Paredes lisas</p></div>
+                         <div class="potential-item text-sm"><h3 class="font-bold text-xs mb-1">Robustez</h3><p>Estabilidad</p></div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+         <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 2: NANOTUBOS DE CARBONO COMO ADSORBENTES AVANZADOS</p> </div>
+    </div>
+
+    <!-- Slide 6: Propiedades Intrínsecas -->
+    <div id="slide-6" class="slide">
+         <div class="title-bar"> <h1 class="text-3xl font-bold">Propiedades Intrínsecas que Gobiernan la Adsorción</h1> </div>
+         <div class="flex flex-1 mt-4 gap-4">
+             <div class="w-1/3 info-card p-4 flex flex-col">
+                 <div class="property-title px-3 py-1 mb-3"> <h2 class="text-lg font-bold flex items-center"><i class="fas fa-expand-arrows-alt text-green-400 mr-2"></i> Área/Porosidad</h2> </div>
+                 <div class="flex justify-center mb-3 relative h-32"> <svg viewBox="0 0 100 100" class="w-32 h-32"> <circle cx="50" cy="50" r="20" fill="rgba(16, 185, 129, 0.3)" stroke="rgba(16, 185, 129, 0.8)" stroke-width="1" /><text x="50" y="50" text-anchor="middle" fill="white" font-size="4">Interior</text> <circle cx="50" cy="50" r="30" fill="transparent" stroke="rgba(255, 255, 255, 0.8)" stroke-width="2" /><circle cx="25" cy="70" r="8" fill="rgba(96, 165, 250, 0.3)" stroke="rgba(96, 165, 250, 0.8)" stroke-width="1" /><circle cx="75" cy="70" r="8" fill="rgba(96, 165, 250, 0.3)" stroke="rgba(96, 165, 250, 0.8)" stroke-width="1" /><text x="50" y="75" text-anchor="middle" fill="white" font-size="4">Intersticial</text> </svg> </div>
+                 <ul class="mt-1 space-y-1 text-xs flex-grow">
+                     <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-1"></i><span><span class="highlight-text">Alta capacidad</span> potencial</span></li>
+                     <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-1"></i><span><span class="highlight-text">Sintonizable</span> por funcionalización/defectos</span></li>
+                     <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-1"></i><span>Rango: <span class="highlight-text">200-1300 m²/g</span></span></li>
+                 </ul>
+                 <div class="mt-2 text-center bg-blue-900 bg-opacity-30 p-1 rounded-lg"><p class="text-xs italic">Distribución de poros clave</p></div>
+             </div>
+             <div class="w-1/3 info-card p-4 flex flex-col">
+                 <div class="property-title px-3 py-1 mb-3"> <h2 class="text-lg font-bold flex items-center"><i class="fas fa-ruler-horizontal text-green-400 mr-2"></i> Efecto Diámetro</h2> </div>
+                 <div class="flex justify-around items-center mb-3 relative h-32">
+                     <div class="flex flex-col items-center"> <div class="nanotube-small relative"><div class="lattice"></div><div class="molecule-small" style="top: 15px; left: 20px;"></div><div class="molecule" style="top: 80px; left: 10px; opacity: 0.3;"></div><div class="selectivity-arrow" style="top: 15px; left: 25px; width:30px; transform: rotate(45deg) scaleX(0.5);"></div></div> <p class="mt-1 text-xs font-semibold">Pequeño</p> </div>
+                     <div class="flex flex-col items-center"> <div class="nanotube-medium relative"><div class="lattice"></div><div class="molecule-small" style="top: 30px; left: 30px;"></div><div class="molecule" style="top: 60px; left: 40px;"></div><div class="selectivity-arrow" style="top: 30px; left: 40px; width:40px; transform: rotate(30deg) scaleX(0.8);"></div></div> <p class="mt-1 text-xs font-semibold">Medio</p> </div>
+                     <div class="flex flex-col items-center"> <div class="nanotube-large relative"><div class="lattice"></div><div class="molecule-small" style="top: 35px; left: 40px;"></div><div class="molecule" style="top: 70px; left: 50px;"></div><div class="molecule-small" style="top: 55px; left: 20px;"></div><div class="molecule" style="top: 95px; left: 35px;"></div></div> <p class="mt-1 text-xs font-semibold">Grande</p> </div>
+                 </div>
+                 <ul class="mt-1 space-y-1 text-xs flex-grow">
+                     <li class="flex items-start"><i class="fas fa-filter text-blue-400 mt-1 mr-1"></i><span><span class="highlight-text">Tamizado molecular</span> (exclusión)</span></li>
+                     <li class="flex items-start"><i class="fas fa-compress-alt text-blue-400 mt-1 mr-1"></i><span><span class="highlight-text">Confinamiento</span> (interacciones)</span></li>
+                     <li class="flex items-start"><i class="fas fa-balance-scale text-blue-400 mt-1 mr-1"></i><span><span class="highlight-text">Selectividad</span> dependiente (Ej: CO₂/CH₄)</span></li>
+                 </ul>
+                 <div class="mt-2 bg-blue-900 bg-opacity-30 p-1 rounded-lg"><p class="text-center text-xs italic">Diámetro óptimo específico</p></div>
+             </div>
+             <div class="w-1/3 info-card p-4 flex flex-col">
+                 <div class="property-title px-3 py-1 mb-3"> <h2 class="text-lg font-bold flex items-center"><i class="fas fa-dna text-green-400 mr-2"></i> Efecto Quiralidad (SWCNT)</h2> </div>
+                 <div class="relative h-32 mb-3"> <canvas id="chiralityChart" width="180" height="100"></canvas> </div> <!-- Smaller canvas -->
+                 <div class="flex justify-around mb-2">
+                     <div class="flex flex-col items-center"> <div class="h-8 w-8 rounded-md armchair-pattern border border-white border-opacity-20"></div> <p class="mt-1 text-xs font-semibold">Armchair</p> <p class="text-xxs text-gray-300">Metálico</p> </div>
+                     <div class="flex flex-col items-center"> <div class="h-8 w-8 rounded-md zigzag-pattern border border-white border-opacity-20"></div> <p class="mt-1 text-xs font-semibold">Zigzag</p> <p class="text-xxs text-gray-300">Semicond.</p> </div>
+                     <div class="flex flex-col items-center"> <div class="h-8 w-8 rounded-md chiral-pattern border border-white border-opacity-20"></div> <p class="mt-1 text-xs font-semibold">Chiral</p> <p class="text-xxs text-gray-300">Variable</p> </div>
+                 </div>
+                 <ul class="mt-1 space-y-1 text-xs flex-grow">
+                     <li class="flex items-start"><i class="fas fa-bolt text-purple-400 mt-1 mr-1"></i><span>Determina <span class="highlight-text">prop. electrónicas</span></span></li>
+                     <li class="flex items-start"><i class="fas fa-exchange-alt text-purple-400 mt-1 mr-1"></i><span>Influye <span class="highlight-text">transf. carga</span></span></li>
+                     <li class="flex items-start"><i class="fas fa-sort text-purple-400 mt-1 mr-1"></i><span>Potencial <span class="highlight-text">selectividad</span> helicoidal</span></li>
+                 </ul>
+                 <div class="mt-2 bg-blue-900 bg-opacity-30 p-1 rounded-lg"><p class="text-center text-xs italic">Control difícil en síntesis</p></div>
+             </div>
+         </div>
+         <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 2: NANOTUBOS DE CARBONO COMO ADSORBENTES AVANZADOS</p> </div>
+    </div>
+
+    <!-- Slide 7: Interacciones Intermoleculares -->
+    <div id="slide-7" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">Interacciones Intermoleculares Clave en CNTs</h1> </div>
+        <div class="flex flex-1 mt-4 gap-4">
+            <div class="w-1/3 info-card p-4 flex flex-col">
+                <div class="interaction-title px-3 py-1 mb-3"> <h2 class="text-lg font-bold flex items-center"><i class="fas fa-atom text-green-400 mr-2"></i> Van der Waals (Alcanos)</h2> </div>
+                <div class="molecule relative mb-3 h-36">
+                    <div class="nanotube-horizontal mx-auto mb-2"></div>
+                    <div class="flex justify-center mt-2"> <div class="atom atom-c" style="top: 50px; left: 30px;">C</div> <div class="bond" style="top: 59px; left: 40px; width: 20px;"></div> <div class="atom atom-c" style="top: 50px; left: 55px;">C</div> <div class="bond" style="top: 59px; left: 65px; width: 20px;"></div> <div class="atom atom-c" style="top: 50px; left: 80px;">C</div> <div class="bond" style="top: 59px; left: 90px; width: 20px;"></div> <div class="atom atom-c" style="top: 50px; left: 105px;">C</div> <div class="interaction-arrow" style="top: 35px; left: 40px; width: 20px;"></div> <div class="interaction-arrow" style="top: 35px; left: 65px; width: 20px;"></div> <div class="interaction-arrow" style="top: 35px; left: 90px; width: 20px;"></div> </div>
+                    <div class="text-center text-xxs mt-1"><span class="text-green-400">Dispersión</span> entre átomos</div>
+                </div>
+                <ul class="mt-1 space-y-2 text-xs flex-grow">
+                    <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-1"></i><span><span class="text-green-400 font-semibold">Fuerza dominante</span> para no polares</span></li>
+                    <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-1"></i><span><span class="text-green-400 font-semibold">Más fuerte</span> para cadenas largas</span></li>
+                    <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-1"></i><span>Base para separación por <span class="text-green-400 font-semibold">longitud</span></span></li>
+                </ul>
+                <div class="mt-2 text-center bg-blue-900 bg-opacity-30 p-1 rounded-lg"><p class="text-xs"><span class="font-bold">Fuerza:</span> 0.5-5 kJ/mol/átomo</p></div>
+            </div>
+            <div class="w-1/3 info-card p-4 flex flex-col">
+                <div class="interaction-title px-3 py-1 mb-3"> <h2 class="text-lg font-bold flex items-center"><i class="fas fa-project-diagram text-green-400 mr-2"></i> Pi-Pi (Alquenos)</h2> </div>
+                 <div class="molecule relative mb-3 h-36">
+                    <div class="nanotube-horizontal mx-auto mb-2"><div class="pi-cloud" style="top: 5px; left: 20px; width: 140px; transform: scaleY(2);"></div></div>
+                    <div class="flex justify-center mt-4"> <div class="atom atom-c" style="top: 50px; left: 60px;">C</div> <div class="bond" style="top: 59px; left: 70px; width: 20px; height: 1px;"></div> <div class="bond" style="top: 61px; left: 70px; width: 20px; height: 1px;"></div> <div class="atom atom-c" style="top: 50px; left: 85px;">C</div> <div class="pi-cloud" style="top: 45px; left: 60px; width: 40px; transform: scaleY(1.5);"></div> <div class="curved-arrow" style="top: 5px; left: 70px; width:20px; height: 20px;"></div> </div>
+                    <div class="text-center text-xxs mt-2"><span class="text-purple-400">Superposición</span> orbitales π</div>
+                </div>
+                <ul class="mt-1 space-y-2 text-xs flex-grow">
+                    <li class="flex items-start"><i class="fas fa-check-circle text-purple-400 mt-1 mr-1"></i><span>Interacción <span class="text-purple-400 font-semibold">CNT π</span> y <span class="text-purple-400 font-semibold">alqueno π</span></span></li>
+                    <li class="flex items-start"><i class="fas fa-check-circle text-purple-400 mt-1 mr-1"></i><span>Relevante para <span class="text-purple-400 font-semibold">sistemas conjugados</span></span></li>
+                    <li class="flex items-start"><i class="fas fa-check-circle text-purple-400 mt-1 mr-1"></i><span>Contribuye a <span class="text-purple-400 font-semibold">selectividad</span> alcano/alqueno</span></li>
+                </ul>
+                <div class="mt-2 text-center bg-blue-900 bg-opacity-30 p-1 rounded-lg"><p class="text-xs"><span class="font-bold">Fuerza:</span> 5-15 kJ/mol</p></div>
+            </div>
+            <div class="w-1/3 info-card p-4 flex flex-col">
+                <div class="interaction-title px-3 py-1 mb-3"> <h2 class="text-lg font-bold flex items-center"><i class="fas fa-flask text-green-400 mr-2"></i> Funcionalización</h2> </div>
+                 <div class="molecule relative mb-3 h-36">
+                    <div class="nanotube-horizontal mx-auto" style="height: 40px;"><div class="lattice"></div> <div class="functionalization-group oh-group" style="top: 2px; left: 20px;">OH</div> <div class="functionalization-group cooh-group" style="top: 15px; left: 70px;">COOH</div> <div class="functionalization-group nh2-group" style="top: 2px; left: 120px;">NH₂</div></div>
+                    <div class="flex justify-around mt-8"> <div class="flex flex-col items-center"><div class="flex"><div class="atom atom-c" style="font-size: 8px;">C-C-C</div></div><i class="fas fa-arrow-up mt-1 text-red-500"></i><p class="text-xxs mt-1">Repelido</p></div> <div class="flex flex-col items-center"><div class="flex"><div class="atom atom-c" style="font-size: 8px;">C=C</div></div><i class="fas fa-arrow-up mt-1 text-green-500"></i><p class="text-xxs mt-1">Atraído</p></div> </div>
+                </div>
+                <ul class="mt-1 space-y-2 text-xs flex-grow">
+                    <li class="flex items-start"><i class="fas fa-plus-circle text-blue-400 mt-1 mr-1"></i><span>Introduce <span class="text-blue-400 font-semibold">interacciones específicas</span></span></li>
+                    <li class="flex items-start"><i class="fas fa-plus-circle text-blue-400 mt-1 mr-1"></i><span>Mejora <span class="text-blue-400 font-semibold">drásticamente selectividad</span></span></li>
+                    <li class="flex items-start"><i class="fas fa-plus-circle text-blue-400 mt-1 mr-1"></i><span>Modifica <span class="text-blue-400 font-semibold">afinidad</span> según grupos</span></li>
+                    <li class="flex items-start"><i class="fas fa-plus-circle text-blue-400 mt-1 mr-1"></i><span><span class="text-blue-400 font-semibold">Parámetro de diseño clave</span></span></li>
+                </ul>
+                <div class="mt-2 text-center bg-green-900 bg-opacity-30 p-1 rounded-lg font-bold"><p class="text-xs">"Clave para la selectividad fina"</p></div>
+            </div>
+        </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 2: NANOTUBOS DE CARBONO COMO ADSORBENTES AVANZADOS</p> </div>
+    </div>
+
+    <!-- Slide 8: Desafíos Síntesis -->
+    <div id="slide-8" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">Desafíos en la Síntesis Controlada de CNTs</h1> </div>
+         <div class="flex flex-1 mt-4 gap-4">
+             <div class="w-1/4">
+                 <h2 class="text-lg font-bold mb-2 text-green-400"><i class="fas fa-flask mr-1"></i> Métodos</h2>
+                 <div class="space-y-2">
+                     <div class="method-card"> <div class="method-header text-sm">Descarga Arco</div> <div class="method-body"><ul class="text-xs space-y-1"><li><i class="fa fa-check text-green-400"></i> Calidad</li><li><i class="fa fa-times text-red-400"></i> Escala</li></ul></div> <div class="method-footer text-xxs">Alto T°</div> </div>
+                     <div class="method-card"> <div class="method-header text-sm">Ablación Láser</div> <div class="method-body"><ul class="text-xs space-y-1"><li><i class="fa fa-check text-green-400"></i> Pureza</li><li><i class="fa fa-times text-red-400"></i> Costo</li></ul></div> <div class="method-footer text-xxs">Caro</div> </div>
+                     <div class="method-card bg-blue-900 bg-opacity-30 border border-green-500"> <div class="method-header text-sm">CVD</div> <div class="method-body"><ul class="text-xs space-y-1"><li><i class="fa fa-check text-green-400"></i> Escala</li><li><i class="fa fa-check text-green-400"></i> Control</li></ul></div> <div class="method-footer text-xxs font-bold">Dominante</div> </div>
+                 </div>
+             </div>
+             <div class="w-2/5">
+                 <h2 class="text-lg font-bold mb-2 text-green-400"><i class="fas fa-industry mr-1"></i> CVD Industrial</h2>
+                 <div class="info-card p-3 h-full flex flex-col">
+                     <h3 class="text-center text-base font-semibold mb-2">Proceso Simplificado</h3>
+                     <div class="furnace mb-2"><div class="furnace-inner"></div><div class="tube"></div> <div class="cat-particle" style="top: 30px; left: 50px;"></div><div class="cat-particle" style="top: 25px; left: 70px;"></div><div class="cat-particle" style="top: 35px; left: 90px;"></div> <div class="carbon-particle" style="top: 28px; left: 30px; animation-delay: 0.2s;"></div><div class="carbon-particle" style="top: 32px; left: 40px; animation-delay: 0.5s;"></div><div class="carbon-particle" style="top: 30px; left: 50px; animation-delay: 0.9s;"></div> </div>
+                     <div class="mermaid h-16 mb-2" id="cvdFlow-s8">
+                       <pre class="mermaid">
+graph LR
+    A[Gas Fuente] --> B(Catalizador)
+    B --> C(Nucleación)
+    C --> D(Crecimiento CNT)
+                       </pre>
+                    </div>
+                     <div class="mt-auto grid grid-cols-2 gap-2 text-xs"> <div class="bg-green-900 bg-opacity-20 p-1 rounded-md"><h4 class="font-semibold text-xxs">Ventajas</h4><ul class="list-disc list-inside text-xxs"><li>Escalable</li><li>Versátil</li></ul></div> <div class="bg-red-900 bg-opacity-20 p-1 rounded-md"><h4 class="font-semibold text-xxs">Limitaciones</h4><ul class="list-disc list-inside text-xxs"><li>Defectos</li><li>Control fino</li></ul></div> </div>
+                 </div>
+             </div>
+             <div class="w-1/3">
+                 <h2 class="text-lg font-bold mb-2 text-green-400"><i class="fas fa-exclamation-triangle mr-1"></i> Retos</h2>
+                 <div class="info-card p-3 mb-2">
+                     <div class="challenge-item"> <div class="challenge-icon"><i class="fas fa-ruler-combined text-green-400 text-xs"></i></div> <div><h3 class="font-semibold text-xs">Diámetro/Quiralidad</h3><p class="text-xxs text-gray-300">Control fino difícil</p></div> </div>
+                     <div class="challenge-item"> <div class="challenge-icon"><i class="fas fa-filter text-green-400 text-xs"></i></div> <div><h3 class="font-semibold text-xs">Pureza</h3><p class="text-xxs text-gray-300">Contaminantes</p></div> </div>
+                     <div class="challenge-item"> <div class="challenge-icon"><i class="fas fa-vial text-green-400 text-xs"></i></div> <div><h3 class="font-semibold text-xs">Funcionalización</h3><p class="text-xxs text-gray-300">Homogeneidad</p></div> </div>
+                     <div class="challenge-item"> <div class="challenge-icon"><i class="fas fa-object-group text-green-400 text-xs"></i></div> <div><h3 class="font-semibold text-xs">Aglomeración</h3><p class="text-xxs text-gray-300">Difícil dispersión</p></div> </div>
+                 </div>
+                 <div class="info-card p-3"> <h3 class="text-center font-semibold mb-1 text-xs">Comparativa</h3> <div class="radar-container"> <canvas id="methodComparisonChart" height="150"></canvas> </div> </div>
+             </div>
+         </div>
+         <div class="mt-3 highlight-box"> <h3 class="text-lg font-bold text-center">Necesidad: Diseño Racional Antes de Síntesis</h3> <p class="text-center mt-1 text-sm"> <i class="fas fa-laptop-code text-blue-400 mr-1"></i> Optimizar virtualmente antes de experimentar </p> </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 2: NANOTUBOS DE CARBONO COMO ADSORBENTES AVANZADOS</p> </div>
+    </div>
+
+    <!-- Slide 9: Solución Propuesta -->
+    <div id="slide-9" class="slide">
+        <!-- Background elements -->
+        <div class="molecule" style="width: 120px; height: 120px; top: 130px; right: 80px;"></div>
+        <div class="molecule" style="width: 180px; height: 180px; bottom: 100px; left: 60px;"></div>
+        <div class="carbon-atom" style="top: 180px; right: 130px;"></div> <div class="carbon-atom" style="bottom: 180px; left: 100px;"></div>
+        <div class="bond" style="top: 185px; right: 130px; width: 40px; transform: rotate(30deg);"></div>
+
+        <div class="title-bar"> <h1 class="text-3xl font-bold">La Solución Propuesta: Simulación Molecular</h1> </div>
+        <div class="highlight-box px-6 py-3 mb-4 mx-auto w-11/12">
+            <div class="text-center"> <h2 class="section-title pulse-animation text-2xl"> Optimización de CNTs Funcionalizados mediante Simulación Molecular </h2> </div>
+        </div>
+        <div class="flex flex-1 gap-5 px-4">
+            <div class="w-1/2">
+                <h3 class="text-xl font-bold mb-3 text-blue-300"><i class="fas fa-bullseye mr-2"></i> Objetivo Central</h3>
+                <div class="bg-black bg-opacity-30 p-4 rounded-lg border-l-4 border-blue-500 h-48 flex flex-col justify-center">
+                    <p class="text-lg mb-4"> Usar <span class="font-bold text-green-400">simulación</span> para: </p>
+                    <ul class="space-y-3 text-base">
+                        <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i><span><span class="font-bold">Diseñar racionalmente</span> CNTs</span></li>
+                        <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i><span><span class="font-bold">Optimizar</span> funcionalización</span></li>
+                        <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i><span>Lograr <span class="font-bold">separación selectiva</span></span></li>
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <div class="mermaid h-24" id="workflowDiagram-s9">
+                        <pre class="mermaid">
+graph LR
+    A[Simulación] --> B(Diseño Virtual)
+    B --> C[Candidatos Óptimos]
+    C --> D(Validación Experimental)
+    style A fill:#10B981,stroke:#059669
+    style B fill:#3B82F6,stroke:#1D4ED8
+    style C fill:#8B5CF6,stroke:#6D28D9
+    style D fill:#EC4899,stroke:#BE185D
+                       </pre>
+                    </div>
+                </div>
+            </div>
+            <div class="w-1/2">
+                <h3 class="text-xl font-bold mb-3 text-blue-300"><i class="fas fa-question-circle mr-2"></i> ¿Por Qué Simulación?</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="advantage-card h-40 relative"> <div class="advantage-header p-2 flex justify-center"><div class="advantage-icon h-10 w-10"><i class="fas fa-search text-white text-lg"></i></div></div> <div class="p-3 pt-6 text-center"><h4 class="font-bold text-sm mb-1">Exploración Eficiente</h4><p class="text-xs">Evaluar miles virtualmente</p><p class="text-xxs mt-1 italic text-green-300">Ahorro t/€</p></div> </div>
+                    <div class="advantage-card h-40 relative"> <div class="advantage-header p-2 flex justify-center"><div class="advantage-icon h-10 w-10"><i class="fas fa-microscope text-white text-lg"></i></div></div> <div class="p-3 pt-6 text-center"><h4 class="font-bold text-sm mb-1">Entendimiento Mecanístico</h4><p class="text-xs">Interacciones moleculares</p><p class="text-xxs mt-1 italic text-green-300">El "por qué"</p></div> </div>
+                    <div class="advantage-card h-40 relative"> <div class="advantage-header p-2 flex justify-center"><div class="advantage-icon h-10 w-10"><i class="fas fa-drafting-compass text-white text-lg"></i></div></div> <div class="p-3 pt-6 text-center"><h4 class="font-bold text-sm mb-1">Diseño Dirigido</h4><p class="text-xs">Predecir mejores mods.</p><p class="text-xxs mt-1 italic text-green-300">Optimización</p></div> </div>
+                    <div class="advantage-card h-40 relative"> <div class="advantage-header p-2 flex justify-center"><div class="advantage-icon h-10 w-10"><i class="fas fa-flask text-white text-lg"></i></div></div> <div class="p-3 pt-6 text-center"><h4 class="font-bold text-sm mb-1">Menos Experimentos</h4><p class="text-xs">Enfocar en prometedores</p><p class="text-xxs mt-1 italic text-green-300">Menor costo</p></div> </div>
+                </div>
+                <div class="mt-3 p-3 bg-blue-900 bg-opacity-30 rounded-lg border-r-4 border-green-500"><p class="italic text-center text-xs"> "Herramienta clave para diseño racional y optimización previa a síntesis." </p></div>
+            </div>
+        </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 3: NUESTRA PROPUESTA: DISEÑO RACIONAL MEDIANTE SIMULACIÓN</p> </div>
+    </div>
+
+    <!-- Slide 10: Metodología -->
+    <div id="slide-10" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">Metodología Computacional</h1> </div>
+        <div class="flex flex-1 mt-4 gap-4">
+            <div class="w-1/2 pr-2">
+                <h2 class="text-lg font-bold mb-3 text-green-400"><i class="fas fa-tools mr-1"></i> Herramientas Principales</h2>
+                <div class="space-y-3">
+                    <div class="method-card flex p-2"> <div class="method-icon h-10 w-10 pulse-animation"><i class="fas fa-cube text-white text-lg"></i></div> <div><h3 class="font-bold text-blue-300 text-base">Modelado Molecular</h3><p class="text-xs">Construcción modelos atómicos</p><div class="flex flex-wrap mt-1 gap-1"><span class="px-1 py-0.5 bg-blue-900 bg-opacity-50 text-xxs rounded">CNTs</span><span class="px-1 py-0.5 bg-blue-900 bg-opacity-50 text-xxs rounded">Alcanos</span></div></div> </div>
+                    <div class="method-card flex p-2"> <div class="method-icon h-10 w-10"><i class="fas fa-atom text-white text-lg"></i></div> <div><h3 class="font-bold text-blue-300 text-base">Funcionalización Virtual</h3><p class="text-xs">Modificación superficie</p><div class="flex flex-wrap mt-1 gap-1"><span class="px-1 py-0.5 bg-green-900 bg-opacity-50 text-xxs rounded">-OH</span><span class="px-1 py-0.5 bg-green-900 bg-opacity-50 text-xxs rounded">-COOH</span><span class="px-1 py-0.5 bg-green-900 bg-opacity-50 text-xxs rounded">Densidad</span></div></div> </div>
+                    <div class="method-card flex p-2"> <div class="method-icon h-10 w-10"><i class="fas fa-random text-white text-lg"></i></div> <div><h3 class="font-bold text-blue-300 text-base">GCMC</h3><p class="text-xs">Adsorción en equilibrio</p><div class="flex flex-wrap mt-1 gap-1"><span class="px-1 py-0.5 bg-purple-900 bg-opacity-50 text-xxs rounded">Isotermas</span><span class="px-1 py-0.5 bg-purple-900 bg-opacity-50 text-xxs rounded">Selectividad</span></div></div> </div>
+                    <div class="method-card flex p-2"> <div class="method-icon h-10 w-10"><i class="fas fa-running text-white text-lg"></i></div> <div><h3 class="font-bold text-blue-300 text-base">MD</h3><p class="text-xs">Evolución temporal</p><div class="flex flex-wrap mt-1 gap-1"><span class="px-1 py-0.5 bg-yellow-900 bg-opacity-50 text-xxs rounded">Difusión</span><span class="px-1 py-0.5 bg-yellow-900 bg-opacity-50 text-xxs rounded">Cinética</span></div></div> </div>
+                    <div class="method-card flex p-2 opacity-70"> <div class="method-icon h-10 w-10 bg-opacity-60"><i class="fas fa-wave-square text-white text-lg"></i></div> <div><h3 class="font-bold text-blue-300 text-base">DFT (Opcional)</h3><p class="text-xs text-gray-300">Interacciones electrónicas</p><div class="flex flex-wrap mt-1 gap-1"><span class="px-1 py-0.5 bg-red-900 bg-opacity-50 text-xxs rounded">Dopantes</span></div></div> </div>
+                </div>
+            </div>
+            <div class="w-1/2 pl-2">
+                <div class="mb-4">
+                    <h2 class="text-lg font-bold mb-2 text-green-400"><i class="fas fa-project-diagram mr-1"></i> Flujo de Trabajo</h2>
+                    <div class="mermaid h-40" id="workflowDiagram-s10">
+                       <pre class="mermaid">
+graph TD
+    A[Modelo Atómico] --> B(Funcionalización)
+    B --> C{Simulación}
+    C -- Equilibrio --> D[GCMC]
+    C -- Dinámica --> E[MD]
+    D & E --> F(Análisis)
+    F --> G(Optimización)
+    G -- Iteración --> B
+    style C fill:#10B981,stroke:#059669
+    style F fill:#3B82F6,stroke:#1D4ED8
+    style G fill:#8B5CF6,stroke:#6D28D9
+                       </pre>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold mb-2 text-green-400"><i class="fas fa-sliders-h mr-1"></i> Parámetros Clave</h2>
+                    <div class="grid-background rounded-lg p-3">
+                        <div class="space-y-2">
+                            <div class="parameter-item flex items-center px-3 py-1 rounded"> <div class="parameter-icon mr-2 h-8 w-8"><i class="fas fa-ruler text-green-400 text-sm"></i></div> <div><h3 class="font-bold text-sm">Estructura CNT</h3><div class="flex flex-wrap gap-1"><span class="px-1 bg-blue-900 bg-opacity-30 text-xxs rounded-full">Diámetro</span><span class="px-1 bg-blue-900 bg-opacity-30 text-xxs rounded-full">Quiralidad</span></div></div> </div>
+                            <div class="parameter-item flex items-center px-3 py-1 rounded"> <div class="parameter-icon mr-2 h-8 w-8"><i class="fas fa-mortar-pestle text-green-400 text-sm"></i></div> <div><h3 class="font-bold text-sm">Funcionalización</h3><div class="flex flex-wrap gap-1"><span class="px-1 bg-green-900 bg-opacity-30 text-xxs rounded-full">Tipo</span><span class="px-1 bg-green-900 bg-opacity-30 text-xxs rounded-full">Densidad</span></div></div> </div>
+                            <div class="parameter-item flex items-center px-3 py-1 rounded"> <div class="parameter-icon mr-2 h-8 w-8"><i class="fas fa-cog text-green-400 text-sm"></i></div> <div><h3 class="font-bold text-sm">Condiciones</h3><div class="flex flex-wrap gap-1"><span class="px-1 bg-purple-900 bg-opacity-30 text-xxs rounded-full">P, T</span><span class="px-1 bg-purple-900 bg-opacity-30 text-xxs rounded-full">Mezcla</span></div></div> </div>
+                        </div>
+                    </div>
+                     <div class="mt-2 bg-blue-900 bg-opacity-30 p-2 rounded-lg text-xs text-center"><div class="font-bold text-blue-300">Escala</div><div class="flex justify-center mt-1 space-x-3"><p><span class="font-bold text-yellow-300">~50+</span> estructuras</p><p><span class="font-bold text-yellow-300">~10+</span> funcionaliz.</p><p><span class="font-bold text-yellow-300">~15+</span> condiciones</p></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 3: NUESTRA PROPUESTA: DISEÑO RACIONAL MEDIANTE SIMULACIÓN</p> </div>
+    </div>
+
+    <!-- Slide 11: Resultados Esperados -->
+    <div id="slide-11" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">Resultados Esperados del Proyecto</h1> </div>
+        <div class="grid grid-cols-2 gap-4 flex-1 mt-4">
+            <div class="result-card">
+                <div class="result-header flex items-center"> <div class="result-icon"><i class="fas fa-brain text-white text-lg"></i></div> <h2 class="text-base font-bold">1. Modelo Predictivo Validado</h2> </div>
+                <div class="p-3 flex flex-col h-full">
+                    <div class="model-visual mb-2 flex-grow"> <div class="grid-lines"></div> <div class="prediction-line" style="top: 80px; left: 20px; width: 200px; transform: rotate(-15deg);"></div> <div class="data-point exp-point" style="top: 60px; left: 30px;"></div> <div class="data-point exp-point" style="top: 85px; left: 60px;"></div> <div class="data-point exp-point" style="top: 100px; left: 90px;"></div> <div class="data-point exp-point" style="top: 90px; left: 130px;"></div> <div class="data-point pred-point" style="top: 65px; left: 30px;"></div> <div class="data-point pred-point" style="top: 80px; left: 60px;"></div> <div class="data-point pred-point" style="top: 95px; left: 90px;"></div> <div class="data-point pred-point" style="top: 95px; left: 130px;"></div> <div class="absolute bottom-1 right-1 bg-black bg-opacity-50 p-1 rounded text-xxs"><div class="flex items-center mb-0.5"><div class="w-2 h-2 bg-red-500 rounded-full mr-1"></div><span>Exp</span></div><div class="flex items-center"><div class="w-2 h-2 bg-blue-500 rounded-full mr-1"></div><span>Pred</span></div></div> </div>
+                    <ul class="space-y-1 text-xs mt-auto"> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span><span class="text-green-300">Herramienta</span> para seleccionar/diseñar</span></li> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Predicción <span class="text-green-300">capacidad/selectividad</span></span></li> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Validación experimental (si datos disp.)</span></li> </ul>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="result-header flex items-center"> <div class="result-icon"><i class="fas fa-map text-white text-lg"></i></div> <h2 class="text-base font-bold">2. Mapas de Selectividad</h2> </div>
+                 <div class="p-3 flex flex-col h-full">
+                     <!-- Placeholder for Heatmap -->
+                     <div class="heatmap-container mb-2 flex-grow flex items-center justify-center text-gray-400 italic">
+                         (Visualización de mapa de calor aquí)
+                     </div>
+                     <ul class="space-y-1 text-xs mt-auto">
+                         <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Visualización <span class="text-green-300">selectividad vs parámetros</span></span></li>
+                         <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Identificación <span class="text-green-300">zonas óptimas</span></span></li>
+                         <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Relaciones estructura-propiedad</span></li>
+                     </ul>
+                 </div>
+            </div>
+            <div class="result-card">
+                <div class="result-header flex items-center"> <div class="result-icon"><i class="fas fa-award text-white text-lg"></i></div> <h2 class="text-base font-bold">3. Candidatos Óptimos</h2> </div>
+                <div class="p-3 flex flex-col h-full">
+                    <div class="candidate-container mb-2 flex-grow"> <div class="nanotube rotate-slow mr-3" style="transform: rotate(10deg); width: 40px; height:100px;"><div class="func-group" style="top: 15px; right: -3px;"></div><div class="func-group" style="top: 40px; left: -3px;"></div><div class="absolute top-0 left-0 w-full text-center text-xxs mt-0.5">7,5</div></div> <div class="nanotube highlight-pulse" style="transform: rotate(-5deg);"><div class="func-group" style="top: 20px; right: -3px; background:rgba(59,130,246,0.8);"></div><div class="func-group" style="top: 35px; left: -3px; background:rgba(59,130,246,0.8);"></div><div class="func-group" style="top: 60px; right: -3px; background:rgba(59,130,246,0.8);"></div><div class="absolute top-0 left-0 w-full text-center text-xxs mt-0.5">8,8</div></div> <div class="nanotube ml-3" style="transform: rotate(-15deg); width: 50px; height:120px;"><div class="func-group" style="top: 25px; right: -3px; background:rgba(139,92,246,0.8);"></div><div class="func-group" style="top: 50px; left: -3px; background:rgba(139,92,246,0.8);"></div><div class="absolute top-0 left-0 w-full text-center text-xxs mt-0.5">10,2</div></div> </div>
+                    <ul class="space-y-1 text-xs mt-auto"> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Estructuras específicas <span class="text-green-300">mejor performance</span></span></li> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Optimización para <span class="text-green-300">mezclas objetivo</span></span></li> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Candidatos <span class="text-green-300">potencialmente escalables</span></span></li> </ul>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="result-header flex items-center"> <div class="result-icon"><i class="fas fa-handshake text-white text-lg"></i></div> <h2 class="text-base font-bold">4. Colaboración</h2> </div>
+                <div class="p-3 flex flex-col h-full">
+                    <div class="collab-container mb-2 flex-grow"> <div class="node node-comp" style="top: 20px; left: 30px;"><i class="fas fa-laptop-code text-xs"></i></div> <div class="node node-exp" style="top: 20px; left: 110px;"><i class="fas fa-flask text-xs"></i></div> <div class="node node-exp" style="top: 90px; left: 110px;"><i class="fas fa-industry text-xs"></i></div> <div class="node node-comp" style="top: 90px; left: 30px;"><i class="fas fa-cogs text-xs"></i></div> <div class="connection" style="top: 40px; left: 50px; width: 80px;"></div> <div class="connection" style="top: 40px; left: 130px; width: 70px; transform: rotate(90deg);"></div> <div class="connection" style="top: 110px; left: 50px; width: 80px;"></div> <div class="connection" style="top: 40px; left: 50px; width: 70px; transform: rotate(90deg);"></div> <div class="absolute text-xxs font-bold" style="top: 5px; left: 15px;">Simul.</div> <div class="absolute text-xxs font-bold" style="top: 5px; left: 105px;">Síntesis</div> <div class="absolute text-xxs font-bold" style="top: 115px; left: 10px;">Optim.</div> <div class="absolute text-xxs font-bold" style="top: 115px; left: 105px;">Aplic.</div> </div>
+                    <ul class="space-y-1 text-xs mt-auto"> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span><span class="text-green-300">Interacción con grupos de síntesis</span></span></li> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span><span class="text-green-300">Ciclo iterativo</span> simulación-experimento</span></li> <li class="flex items-start"><i class="fas fa-check-circle text-green-400 mr-1"></i><span>Base para <span class="text-green-300">desarrollo y PI</span></span></li> </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 3: NUESTRA PROPUESTA: DISEÑO RACIONAL MEDIANTE SIMULACIÓN</p> </div>
+    </div>
+
+    <!-- Slide 12: Impacto y Valor -->
+    <div id="slide-12" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">Impacto y Valor para YPF / Y-TEC</h1> </div>
+        <div class="grid grid-cols-3 gap-4 flex-1 mt-4">
+            <div class="impact-card">
+                <div class="impact-header tech-header"> <div class="impact-icon tech-icon h-16 w-16"><i class="fas fa-industry text-white text-2xl"></i></div> <h2 class="text-lg font-bold">Tecnológico / Operacional (YPF)</h2> </div>
+                <div class="p-4 flex-grow">
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-flask text-blue-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Nuevos Procesos</h3><p class="text-xs text-gray-300">Base para separación avanzada</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-bolt text-blue-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Reducción Energética</h3><p class="text-xs text-gray-300">Menor consumo OPEX</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-vial text-blue-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Mejora Calidad</h3><p class="text-xs text-gray-300">Productos más puros</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-leaf text-blue-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Sostenibilidad</h3><p class="text-xs text-gray-300">Menor huella CO₂</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-oil-well text-blue-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Vaca Muerta</h3><p class="text-xs text-gray-300">Procesamiento eficiente</p></div> </div>
+                </div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-header science-header"> <div class="impact-icon science-icon h-16 w-16"><i class="fas fa-brain text-white text-2xl"></i></div> <h2 class="text-lg font-bold">Científico / Innovación (Y-TEC)</h2> </div>
+                <div class="p-4 flex-grow">
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-rocket text-green-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Liderazgo</h3><p class="text-xs text-gray-300">Diseño computacional</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-atom text-green-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Conocimiento</h3><p class="text-xs text-gray-300">Adsorción fundamental</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-scroll text-green-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Propiedad Intelectual</h3><p class="text-xs text-gray-300">Patentes materiales/procesos</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-graduation-cap text-green-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Capacidades</h3><p class="text-xs text-gray-300">Expertise en simulación</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-globe text-green-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Referencia</h3><p class="text-xs text-gray-300">Tecnologías separación</p></div> </div>
+                </div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-header economic-header"> <div class="impact-icon economic-icon h-16 w-16"><i class="fas fa-chart-line text-white text-2xl"></i></div> <h2 class="text-lg font-bold">Económico</h2> </div>
+                <div class="p-4 flex-grow">
+                    <div class="mb-4"> <canvas id="economicImpactChart" height="150"></canvas> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-dollar-sign text-yellow-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Ventaja Competitiva</h3><p class="text-xs text-gray-300">Menor OPEX, mayor rendimiento</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-box-open text-yellow-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Nuevos Productos</h3><p class="text-xs text-gray-300">Adsorbentes/procesos</p></div> </div>
+                    <div class="benefit-item"> <div class="benefit-icon h-8 w-8"><i class="fas fa-handshake text-yellow-300 text-sm"></i></div> <div><h3 class="font-semibold text-sm">Licenciamiento</h3><p class="text-xs text-gray-300">Comercialización</p></div> </div>
+                </div>
+            </div>
+        </div>
+        <div class="brand-container"> <div class="text-base font-bold mr-2">Valor Estratégico:</div> <div class="value-gauge"><div class="gauge-needle"></div></div> <div class="brand-logo ypf-logo ml-3 text-sm">YPF</div> <div class="brand-logo ytec-logo text-xs">Y-TEC</div> </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 4: IMPACTO Y CONCLUSIONES</p> </div>
+    </div>
+
+    <!-- Slide 13: Conclusiones -->
+    <div id="slide-13" class="slide">
+        <div class="title-bar"> <h1 class="text-3xl font-bold">Conclusiones</h1> </div>
+        <div class="flex flex-1 mt-4 gap-6">
+            <div class="w-2/3">
+                <div class="conclusion-container h-full relative">
+                    <div class="conclusion-item flex items-center pl-6"> <div class="conclusion-number">1</div> <div class="conclusion-icon h-12 w-12"><i class="fas fa-industry text-green-400 text-lg"></i></div> <div><h2 class="text-lg font-bold text-blue-300">Cuello Botella</h2><p class="text-sm">Separación alcanos: desafío energético/económico</p></div> </div>
+                    <div class="conclusion-item flex items-center pl-6"> <div class="conclusion-number">2</div> <div class="conclusion-icon h-12 w-12"><i class="fas fa-filter text-green-400 text-lg"></i></div> <div><h2 class="text-lg font-bold text-blue-300">Adsorción</h2><p class="text-sm">Alternativa prometedora, necesita materiales optimizados</p></div> </div>
+                    <div class="conclusion-item flex items-center pl-6"> <div class="conclusion-number">3</div> <div class="conclusion-icon h-12 w-12"><i class="fas fa-atom text-green-400 text-lg"></i></div> <div><h2 class="text-lg font-bold text-blue-300">CNTs Funcionalizados</h2><p class="text-sm">Plataforma única y sintonizable</p></div> </div>
+                    <div class="conclusion-item flex items-center pl-6"> <div class="conclusion-number">4</div> <div class="conclusion-icon h-12 w-12"><i class="fas fa-laptop-code text-green-400 text-lg"></i></div> <div><h2 class="text-lg font-bold text-blue-300">Simulación</h2><p class="text-sm">Herramienta clave para diseño racional y optimización</p></div> </div>
+                    <div class="path-arrow" style="top: 80px; left: 480px; width: 40px; transform: rotate(20deg);"></div>
+                    <div class="path-arrow" style="top: 170px; left: 480px; width: 40px;"></div>
+                    <div class="path-arrow" style="top: 260px; left: 480px; width: 40px; transform: rotate(-20deg);"></div>
+                </div>
+            </div>
+            <div class="w-1/3 flex flex-col">
+                <div class="final-card flex-grow flex flex-col justify-center relative">
+                    <div class="shine"></div>
+                    <div class="conclusion-badge"><i class="fas fa-star text-white text-2xl"></i></div>
+                    <div class="text-center mb-4"> <i class="fas fa-lightbulb text-yellow-300 text-4xl mb-2"></i> <h2 class="text-xl font-bold text-white">Nuestra Propuesta</h2> </div>
+                    <p class="text-base leading-relaxed text-center mb-4"> <span class="font-bold text-green-300">Usar simulaciones avanzadas</span> para identificar CNTs óptimos, generando conocimiento y candidatos para <span class="font-bold text-green-300">revolucionar la separación</span> en YPF. </p>
+                    <div class="mt-3 bg-black bg-opacity-30 rounded-lg p-2 text-center"> <h3 class="text-sm font-bold text-blue-300 mb-1">Valor Estratégico</h3> <div class="flex justify-center space-x-3"> <div class="flex flex-col items-center"><i class="fas fa-bolt text-yellow-400 text-base mb-1"></i><span class="text-xs">Eficiencia</span></div> <div class="flex flex-col items-center"><i class="fas fa-dollar-sign text-green-400 text-base mb-1"></i><span class="text-xs">Ahorro</span></div> <div class="flex flex-col items-center"><i class="fas fa-trophy text-blue-400 text-base mb-1"></i><span class="text-xs">Innovación</span></div> <div class="flex flex-col items-center"><i class="fas fa-leaf text-green-400 text-base mb-1"></i><span class="text-xs">Sostenibilidad</span></div> </div> </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+             <div class="mermaid h-20" id="projectSummary-s13">
+                <pre class="mermaid">
+graph LR
+    A[Problema<br>Separación] --> B(CNTs<br>Funcionalizados)
+    B --> C[Diseño<br>Computacional]
+    C --> D[Candidatos<br>Optimizados]
+    D --> E[Valor para<br>YPF/Y-TEC]
+    style E fill:#10B981,stroke:#059669,stroke-width:2px
+                </pre>
+            </div>
+        </div>
+        <div class="section-footer"> <p><i class="fas fa-bookmark mr-1"></i> SECCIÓN 4: IMPACTO Y CONCLUSIONES</p> </div>
+    </div>
+
+    <!-- Slide 14: Agradecimientos y Preguntas -->
+    <div id="slide-14" class="slide">
+        <!-- Background elements -->
+        <div class="nanotube" style="width: 70px; height: 250px; top: 130px; left: 40px; transform: rotate(-15deg);"><div class="lattice"></div></div>
+        <div class="nanotube" style="width: 50px; height: 200px; bottom: 80px; right: 50px; transform: rotate(20deg);"><div class="lattice"></div></div>
+
+        <div class="title-bar"> <h1 class="text-3xl font-bold">Agradecimientos y Preguntas</h1> </div>
+        <div class="flex flex-1 mt-4 gap-6">
+            <div class="w-1/2 flex flex-col justify-between p-4">
+                <div>
+                    <h2 class="text-xl font-bold mb-3 text-blue-300"><i class="fas fa-award text-yellow-400 mr-2 text-2xl"></i> Agradecimientos</h2>
+                    <ul class="list-disc list-inside space-y-1 text-sm ml-4"> <li>Dirección I+D Y-TEC</li> <li>Equipo Materiales Avanzados</li> <li>Área Simulación</li> <li>Gerencia Procesos YPF</li> </ul>
+                    <div class="pt-4 text-center"> <p class="thanks-highlight text-lg font-bold">¡Gracias por su atención!</p> </div>
+                </div>
+                <div class="flex justify-center items-center mt-6">
+                    <div class="brand-logo ypf-logo text-lg">YPF</div>
+                    <div class="brand-logo ytec-logo text-base">Y-TEC</div>
+                 </div>
+            </div>
+            <div class="w-1/2 flex flex-col items-center justify-center p-4">
+                <div class="mb-8 text-center"> <h2 class="questions-text text-5xl">¿Preguntas?</h2> </div>
+                <div class="contact-card w-full max-w-sm">
+                    <div class="card-header"><h3 class="text-lg font-bold">Contacto</h3></div>
+                    <div class="card-body">
+                        <div class="contact-item"> <div class="contact-icon h-8 w-8"><i class="fas fa-user text-green-400 text-sm"></i></div> <div><h4 class="font-bold text-sm">[Tu Nombre]</h4><p class="text-xs text-gray-300">Investigador Principal</p></div> </div>
+                        <div class="contact-item"> <div class="contact-icon h-8 w-8"><i class="fas fa-envelope text-green-400 text-sm"></i></div> <div><h4 class="font-bold text-sm">tu.correo@ytec.com.ar</h4><p class="text-xs text-gray-300">Email</p></div> </div>
+                        <div class="contact-item"> <div class="contact-icon h-8 w-8"><i class="fas fa-building text-green-400 text-sm"></i></div> <div><h4 class="font-bold text-sm">Y-TEC</h4><p class="text-xs text-gray-300">Div. Nanomateriales</p></div> </div>
+                        <div class="flex justify-center mt-4"> <a href="#" class="social-icon h-8 w-8"><i class="fab fa-linkedin text-white text-sm"></i></a> <a href="#" class="social-icon h-8 w-8"><i class="fab fa-researchgate text-white text-sm"></i></a> <a href="#" class="social-icon h-8 w-8"><i class="fab fa-google-scholar text-white text-sm"></i></a> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- End of slide-container -->
+
+<!-- Navigation Buttons -->
+<div id="navigation">
+    <button id="prevBtn"><i class="fas fa-arrow-left"></i> Prev</button>
+    <span id="slideCounter">1 / 14</span>
+    <button id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Mermaid Initialization
+        mermaid.initialize({
+            startOnLoad: false, // Set to false, render manually
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#10B981',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#1e3a8a',
+                lineColor: '#10B981',
+                secondaryColor: '#1e3a8a',
+                tertiaryColor: '#0a2463'
+            }
+        });
+
+        // Function to render Mermaid diagrams on the *active* slide
+        async function renderMermaid() {
+             const activeSlide = document.querySelector('.slide.active-slide');
+             if (activeSlide) {
+                const mermaidElements = activeSlide.querySelectorAll('.mermaid > pre.mermaid');
+                if (mermaidElements.length > 0) {
+                    // Ensure container has unique ID for rendering if not already set
+                    mermaidElements.forEach((el, index) => {
+                         const container = el.parentNode;
+                         if (!container.getAttribute('data-processed')) { // Check if already processed
+                             const id = `mermaid-${activeSlide.id}-${index}`; // Unique ID per slide instance
+                             container.setAttribute('id', id); // Set ID on the container div
+                             container.setAttribute('data-processed', 'true'); // Mark as processed
+                             container.innerHTML = `<pre class="mermaid">${el.textContent}</pre>`; // Ensure clean content
+                         }
+                     });
+                    // Render all mermaid elements within the active slide
+                    try {
+                        await mermaid.run({
+                           nodes: activeSlide.querySelectorAll('.mermaid') // Select the container divs
+                        });
+                    } catch (error) {
+                        console.error("Mermaid rendering error:", error);
+                        // Optionally display an error message on the slide
+                    }
+                }
+            }
+        }
+
+
+        // --- Chart.js Initializations ---
+        // Slide 3: Boiling Points
+        const ctxBoiling = document.getElementById('boilingPointChart')?.getContext('2d');
+        if (ctxBoiling) {
+            new Chart(ctxBoiling, {
+                type: 'bar', data: { labels: ['Etano', 'Etileno', 'Propano', 'Propileno', 'n-But', 'Isobut'], datasets: [{ data: [-89, -104, -42, -47.6, -0.5, -11.7], backgroundColor: ['rgba(16, 185, 129, 0.6)', 'rgba(16, 185, 129, 0.8)', 'rgba(14, 165, 233, 0.6)', 'rgba(14, 165, 233, 0.8)', 'rgba(99, 102, 241, 0.6)', 'rgba(99, 102, 241, 0.8)'], borderColor: ['#10B981', '#10B981', '#0EA5E9', '#0EA5E9', '#6366F1', '#6366F1'], borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 8 } } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 8 } } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}°C` } } } }
+            });
+        }
+
+        // Slide 8: Method Comparison (Radar)
+        const ctxMethod = document.getElementById('methodComparisonChart')?.getContext('2d');
+         if (ctxMethod) {
+             new Chart(ctxMethod, {
+                 type: 'radar', data: { labels: ['Escala', 'Ø Control', 'Pureza', 'Quiralidad', 'Costo'], datasets: [{ label: 'CVD', data: [9, 6, 5, 4, 8], backgroundColor: 'rgba(16, 185, 129, 0.2)', borderColor: 'rgba(16, 185, 129, 0.8)', pointBackgroundColor: '#10B981', borderWidth: 1 }, { label: 'Arco', data: [3, 4, 6, 5, 3], backgroundColor: 'rgba(96, 165, 250, 0.2)', borderColor: 'rgba(96, 165, 250, 0.8)', pointBackgroundColor: '#60A5FA', borderWidth: 1 }, { label: 'Láser', data: [2, 7, 8, 7, 2], backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgba(239, 68, 68, 0.8)', pointBackgroundColor: '#EF4444', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: 'rgba(255,255,255,0.7)', font: { size: 8 } }, ticks: { display: false, stepSize: 2 } } }, plugins: { legend: { display: false } } }
+             });
+         }
+
+         // Slide 6: Chirality Map (Scatter)
+         const ctxChirality = document.getElementById('chiralityChart')?.getContext('2d');
+         if (ctxChirality) {
+             new Chart(ctxChirality, {
+                 type: 'scatter', data: { datasets: [{ label: 'Metálico', data: [ {x: 3, y: 3}, {x: 4, y: 4}, {x: 5, y: 5}, {x: 6, y: 6}, {x: 9, y: 0}, {x: 0, y: 9}, {x: 6, y: 3}, {x: 3, y: 6} ], backgroundColor: 'rgba(16, 185, 129, 0.6)', pointRadius: 4 }, { label: 'Semiconductor', data: [ {x: 1, y: 2}, {x: 2, y: 1}, {x: 4, y: 2}, {x: 2, y: 4}, {x: 7, y: 2}, {x: 8, y: 4}, {x: 2, y: 7}, {x: 4, y: 8} ], backgroundColor: 'rgba(96, 165, 250, 0.6)', pointRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, title: { display: true, text: 'Mapa (n,m)', color: 'white', font: { size: 10 } } }, scales: { x: { title: { display: true, text: 'n', color: 'white', font:{size:8} }, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 8 } } }, y: { title: { display: true, text: 'm', color: 'white', font:{size:8} }, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 8 } } } } }
+             });
+         }
+
+         // Slide 12: Economic Impact
+         const ctxEconomic = document.getElementById('economicImpactChart')?.getContext('2d');
+          if (ctxEconomic) {
+              new Chart(ctxEconomic, {
+                  type: 'bar', data: { labels: ['Costos', 'Energía', 'Calidad', 'ROI'], datasets: [{ data: [25, 40, 30, 35], backgroundColor: ['rgba(245, 158, 11, 0.6)', 'rgba(16, 185, 129, 0.6)', 'rgba(59, 130, 246, 0.6)', 'rgba(139, 92, 246, 0.6)'], borderColor: ['#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'], borderWidth: 1 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 8 } } }, y: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 8 } } } }, plugins: { legend: { display: false }, title: { display: true, text: 'Potencial Impacto Económico (%)', color: 'white', font: { size: 10 } } } }
+              });
+          }
+        // --- End Chart.js Initializations ---
+
+
+        // --- Navigation Logic ---
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideCounter = document.getElementById('slideCounter');
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+
+        function updateSlideCounter() {
+             slideCounter.textContent = `${currentSlideIndex + 1} / ${totalSlides}`;
+        }
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                 slide.classList.toggle('active-slide', i === index);
+            });
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === totalSlides - 1;
+            updateSlideCounter();
+            // Re-render mermaid on the newly shown slide AFTER it's visible
+            setTimeout(renderMermaid, 50); // Small delay ensures slide is displayed
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') { // Added space bar
+                nextSlide();
+                event.preventDefault(); // Prevent space bar scrolling
+            } else if (event.key === 'ArrowLeft' || event.key === 'PageUp' || event.key === 'Backspace') { // Added Backspace
+                prevSlide();
+                event.preventDefault();
+            }
+        });
+
+        // Initial setup
+        showSlide(currentSlideIndex);
+        // --- End Navigation Logic ---
+
+    });
+</script>
+
+</body>
+</html>
